@@ -138,32 +138,32 @@ def get_column():
 			"fieldname": "work_r_date",
 			"width": 140
 		},
-		# {
-		# 	"label": "Consolidated Pick List No (Material transfer for Manu)",
-		# 	"fieldtype": "Data",
-		# 	"fieldname": "consolidated_p_list_no",
-		# 	# "options":"",
-		# 	"width": 250
-		# },
-		# {
-		# 	"label": "Consolidated Pick List Date (Material transfer for Manu)",
-		# 	"fieldtype": "Date",
-		# 	"fieldname": "consolidated_p_list_date",
-		# 	"width": 250
-		# },
-		# {
-		# 	"label": "Stock Entry No (Material transfer for Manu)",
-		# 	"fieldtype": "Link",
-		# 	"fieldname": "stock_e_no",
-		# 	# "options":"Stock Entry",
-		# 	"width": 250
-		# },
-		# {
-		# 	"label": "Stock Entry Date (Material transfer for Manu)",
-		# 	"fieldtype": "Date",
-		# 	"fieldname": "stock_e_date",
-		# 	"width": 250
-		# },
+		{
+		 	"label": "Consolidated Pick List No (Material transfer for Manu)",
+		 	"fieldtype": "Data",
+		 	"fieldname": "consolidated_p_list_no",
+		 	# "options":"",
+		 	"width": 250
+		 },
+		{
+			"label": "Consolidated Pick List Date (Material transfer for Manu)",
+			"fieldtype": "Date",
+			"fieldname": "consolidated_p_list_date",
+			"width": 250
+		},
+		{
+			"label": "Stock Entry No (Material transfer for Manu)",
+			"fieldtype": "Link",
+			"fieldname": "stock_e_no",
+			"options":"Stock Entry",
+			"width": 250
+		},
+		{
+			"label": "Stock Entry Date (Material transfer for Manu)",
+			"fieldtype": "Date",
+			"fieldname": "stock_e_date",
+			"width": 250
+		},
 		# {
 		# 	"label": "Stock Entry Item (Material transfer for Manu)",
 		# 	"fieldtype": "Link",
@@ -184,32 +184,32 @@ def get_column():
 		# 	# "options":"",
 		# 	"width": 250
 		# },
-		# {
-		# 	"label": "Consolidated Pick List No ( Manufacture)",
-		# 	"fieldtype": "Data",
-		# 	"fieldname": "consolidated_p_list_no_manufecture",
-		# 	# "options":"",
-		# 	"width": 250
-		# },
-		# {
-		# 	"label": "Consolidated Pick List Date ( Manufacture)",
-		# 	"fieldtype": "Date",
-		# 	"fieldname": "consolidated_p_list_date_manufecture",
-		# 	"width": 250
-		# },
-		# {
-		# 	"label": "Stock Entry No ( Manufacture)",
-		# 	"fieldtype": "Link",
-		# 	"fieldname": "stock_e__no",
-		# 	# "options":"Stock Entry",
-		# 	"width": 200
-		# },
-		# {
-		# 	"label": "Stock Entry Date ( Manufacture)",
-		# 	"fieldtype": "Date",
-		# 	"fieldname": "stock_e_b_date",
-		# 	"width": 200
-		# },
+		{
+			"label": "Consolidated Pick List No ( Manufacture)",
+			"fieldtype": "Data",
+			"fieldname": "consolidated_p_list_no_manufecture",
+			# "options":"",
+			"width": 250
+		},
+		{
+			"label": "Consolidated Pick List Date ( Manufacture)",
+			"fieldtype": "Date",
+			"fieldname": "consolidated_p_list_date_manufecture",
+			"width": 250
+		},
+		{
+			"label": "Stock Entry No ( Manufacture)",
+			"fieldtype": "Link",
+			"fieldname": "stock_e__no",
+			"options":"Stock Entry",
+			"width": 200
+		},
+		{
+			"label": "Stock Entry Date ( Manufacture)",
+			"fieldtype": "Date",
+			"fieldname": "stock_e_b_date",
+			"width": 200
+		},
 		# {
 		# 	"label": "Stock Entry Item ( Manufacture)",
 		# 	"fieldtype": "Link",
@@ -270,6 +270,9 @@ def get_column():
 		]
 	return column
 def get_data(filters):
+
+	cond = get_condition(filters)
+	
 	sql = """select 
 			tso.name,
 			tso.transaction_date,
@@ -287,11 +290,18 @@ def get_data(filters):
 			tpr.posting_date,
 			two.name,
 			two.actual_start_date,
+			tcpl.name,
+			tcpl.planned_start_date,
+			tse2.name,
+			tse2.posting_date,
+			tcpl2.name,
+			tcpl2.planned_start_date,
+			tse.name,
+			tse.posting_date,
 			tdn.name,
 			tdn.posting_date,
 			tdni.item_code,
 			tdni.qty
-			
 		from `tabSales Order Item`tsoi 
 		left join `tabSales Order` tso on tso.name = tsoi.parent
 		left join `tabSales Order Table` tsot on tsot.sales_order = tso.name
@@ -301,9 +311,48 @@ def get_data(filters):
 		left join `tabPurchase Receipt Item` tpri on tpri.purchase_order = tpo.name 
 		left join `tabPurchase Receipt` tpr on tpr.name = tpri.parent
 		left join `tabWork Order` two on two.production_planning_with_lead_time = tppwlt.name
+		left join `tabPick List FG Work Orders` tplfwo on tplfwo.work_order = two.name
+		left join `tabConsolidated Pick List` tcpl on tcpl.name = tplfwo.parent and tcpl.purpose = "Material Transfer for Manufacture"
+		left join `tabConsolidated Pick List` tcpl2 on tcpl2.name = tplfwo.parent and tcpl2.purpose = "Manufacture"
+		left join `tabStock Entry` tse on tse.consolidated_pick_list = tcpl2.name and tse.stock_entry_type = "Manufacture"
+		left join `tabStock Entry` tse2 on tse2.consolidated_pick_list = tcpl.name and tse2.stock_entry_type = "Material Transfer for Manufacture"
 		left join `tabDelivery Note Item` tdni on tdni.parent = tso.name
 		left join `tabDelivery Note` tdn on tdn.name = tdni.parent
-
-		"""
+		Where %s
+		"""%(cond)
 	data = frappe.db.sql(sql)
 	return data
+
+def get_condition(filters):
+	cond = "1 = 1"
+	if filters.get("item_code"):
+		cond = " AND tsoi.item_code = '{0}'".format(filters.get("item_code"))
+
+	if filters.get("doctype") == "Sales Order" and filters.get("doctype_name"):
+		cond = " AND tso.name = '{0}'".format(filters.get("doctype_name"))
+
+	if filters.get("doctype") == "Production Planning With Lead Time" and filters.get("doctype_name"):
+		cond = " AND tppwlt.name = '{0}'".format(filters.get("doctype_name"))
+
+	if filters.get("doctype") == "Material Request" and filters.get("doctype_name"):
+		cond = " AND tmr.name = '{0}'".format(filters.get("doctype_name"))
+
+	if filters.get("doctype") == "Purchase Order" and filters.get("doctype_name"):
+		cond = " AND tpo.name = '{0}'".format(filters.get("doctype_name"))
+
+	if filters.get("doctype") == "Purchase Receipt" and filters.get("doctype_name"):
+		cond = " AND tpr.name = '{0}'".format(filters.get("doctype_name"))
+
+	if filters.get("doctype") == "Work Order" and filters.get("doctype_name"):
+		cond = " AND two.name = '{0}'".format(filters.get("doctype_name"))
+
+	if filters.get("doctype") == "Consolidated Pick List" and filters.get("doctype_name"):
+		cond = " AND tcpl.name = '{0}'".format(filters.get("doctype_name"))
+
+	if filters.get("doctype") == "Stock Entry" and filters.get("doctype_name"):
+		cond = " AND tse.name = '{0}'".format(filters.get("doctype_name"))
+	
+	if filters.get("doctype") == "Delivery Note" and filters.get("doctype_name"):
+		cond = " AND tdn.name = '{0}'".format(filters.get("doctype_name"))
+
+	return cond

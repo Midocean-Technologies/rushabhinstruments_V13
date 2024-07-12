@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 frappe.query_reports["Traceability Report"] = {
+
 	"filters": [
 		{
 			fieldname: "item_code",
@@ -30,4 +31,5 @@ frappe.query_reports["Traceability Report"] = {
 		},
 
 	]
+
 };

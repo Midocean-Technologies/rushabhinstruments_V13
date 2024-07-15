@@ -705,7 +705,7 @@ def get_date_data(start_dt,end_dt):
 
 @frappe.whitelist()
 def get_sub_assembly_item(bom_no, bom_data,indent=0):
-	data = get_children('BOM', parent = bom_no)
+	data = get_children(parent = bom_no)
 	for d in data:
 		if d.expandable:
 			if d.value:

@@ -272,7 +272,8 @@ class ProductionPlanningWithLeadTime(Document):
 				remaining_dict = dict()
 				for item in raw_data:
 					lead_time = frappe.db.get_value("Item",{'name':item.get('item')},'lead_time_days')
-					item.update({'available_stock':ohs.get(item.get('item')),'lead_time':lead_time,'original_qty':item.get('qty')})
+					item_name = frappe.db.get_value("Item",{'name':item.get('item')},'item_name')
+					item.update({'available_stock':ohs.get(item.get('item')),'lead_time':lead_time,'original_qty':item.get('qty'),'item_name':item_name})
 					rm_readiness_days = frappe.db.get_single_value("Rushabh Settings",'rm_readiness_days')
 					date_to_be_ready = datetime.datetime.strptime(row.get('planned_start_date'), '%Y-%m-%d')
 					date_to_be_ready = date_to_be_ready.date()

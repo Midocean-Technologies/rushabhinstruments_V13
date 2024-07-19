@@ -31,7 +31,7 @@ import datetime
 from datetime import date,timedelta
 from erpnext.buying.doctype.purchase_order.purchase_order import make_purchase_receipt
 def on_submit(doc, method = None):
-	prepare_zip_attachment_for_po(doc, method)
+	# prepare_zip_attachment_for_po(doc, method)
 	file_att = []
 	file_att = [frappe.attach_print(doc.doctype, doc.name, file_name=doc.name)]
 	attachments = frappe.db.sql(""" SELECT file_name  FROM tabFile 

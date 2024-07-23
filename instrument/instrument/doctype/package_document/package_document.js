@@ -4,7 +4,7 @@
 frappe.ui.form.on('Package Document', {
 	refresh: function(frm) {
 		frm.add_custom_button(__('Copy Rows'),() => frm.events.copy(frm));
-		// frm.add_custom_button(__('Copy Attachments From Side Bar'),() => frm.events.copy_attachments(frm));
+		frm.add_custom_button(__('Copy Attachments From Side Bar'),() => frm.events.copy_attachments(frm));
 		// frm.add_custom_button(__('Download'),() => frm.events.download_attachments(frm));
 		frm.add_custom_button(__('Download'), function() {
 			frm.trigger('download_attachments')
@@ -121,7 +121,10 @@ frappe.ui.form.on('Package Document', {
 });
 frappe.ui.form.on('Attachment Table', {
 	before_attachment_remove:function(frm){
-		frappe.throw("You Cannot Remove Attachment")
+		if(frm.doc.attachment[0].attachment){
+			frappe.throw("You Cannot Remove Attachment")
+		}
+		
 	},
 })
 frappe.ui.form.on('File Locations Table', {

@@ -3,6 +3,7 @@
 /* eslint-disable */
 
 frappe.query_reports["Traceability Report"] = {
+
 	"filters": [
 		{
 			fieldname: "item_code",
@@ -16,6 +17,19 @@ frappe.query_reports["Traceability Report"] = {
 			fieldtype: "Link",
 			options: "Batch",
 		},
+		{
+			fieldname: "doctype",
+			label: __("Document Type"),
+			fieldtype: "Link",
+			options: "DocType",
+		},
+		{
+			fieldname: "doctype_name",
+			label: __("Document Name"),
+			fieldtype: "Dynamic Link",
+			options: "doctype",
+		},
 
 	]
+
 };

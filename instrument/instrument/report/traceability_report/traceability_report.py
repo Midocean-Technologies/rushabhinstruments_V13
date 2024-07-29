@@ -107,13 +107,13 @@ def get_column():
 			"fieldname": "purchase_r_date",
 			"width": 180
 		},
-		# {
-		# 	"label": "Purchase Receipt Batch No",
-		# 	"fieldtype": "Data",
-		# 	"fieldname": "purchase_r_b_no",
-		# 	# "options":"",
-		# 	"width": 200
-		# }
+		{
+			"label": "Purchase Receipt Batch No",
+			"fieldtype": "Data",
+			"fieldname": "purchase_r_b_no",
+			# "options":"",
+			"width": 200
+		},
 
 		{
 			"label": "Work Order No",
@@ -156,6 +156,29 @@ def get_column():
 		},
 
 		{
+			"label": "Stock Entry Item (Material transfer for Manu)",
+			"fieldtype": "Link",
+			"fieldname": "stock_e_mt_item",
+			"options": "Item",
+			"width": 250
+		},
+
+		{
+			"label": "Stock Entry qty (Material transfer for Manu)",
+			"fieldtype": "Float",
+			"fieldname": "stock_e_mt_qty",
+			"width": 250
+		},
+
+		{
+			"label": "Stock Entry Batch (Material transfer for Manu)",
+			"fieldtype": "Data",
+			"fieldname": "stock_e_mt_batch",
+			"width": 250
+		},
+
+
+		{
 			"label": "Consolidated Pick List No ( Manufacture)",
 			"fieldtype": "Data",
 			"fieldname": "consolidated_p_list_no_manufecture",
@@ -181,6 +204,31 @@ def get_column():
 			"fieldname": "stock_e_b_date",
 			"width": 200
 		},
+
+
+
+		{
+			"label": "Stock Entry Item ( Manufacture)",
+			"fieldtype": "Link",
+			"fieldname": "stock_e__item",
+			"options":"Item",
+			"width": 200
+		},
+		{
+			"label": "Stock Entry Item Qty ( Manufacture)",
+			"fieldtype": "Float",
+			"fieldname": "stock_e__qty",
+			"width": 200
+		},
+		{
+			"label": "Stock Entry Batch ( Manufacture)",
+			"fieldtype": "Data",
+			"fieldname": "stock_e__batch",
+			"width": 200
+		},
+
+
+
 		{
 			"label": "Delivery Note No",
 			"fieldtype": "Link",
@@ -205,6 +253,13 @@ def get_column():
 			"label": "Delivery Note Qty",
 			"fieldtype": "Data",
 			"fieldname": "delivery_n_b_qty",
+			# "options":"",
+			"width": 150
+		},
+		{
+			"label": "Delivery Note Batch",
+			"fieldtype": "Data",
+			"fieldname": "delivery_n_b_batch",
 			# "options":"",
 			"width": 150
 		}
@@ -271,7 +326,8 @@ def get_data(filters):
 			tpo.transaction_date,
 			tpo.supplier_name,
 			tpr.name,
-			tpr.posting_date
+			tpr.posting_date,
+			tpri.serial_and_batch_bundle
 		from `tabPurchase Order` tpo
 		left join `tabPurchase Receipt Item` tpri on tpri.purchase_order = tpo.name 
 		left join `tabPurchase Receipt` tpr on tpr.name = tpri.parent
@@ -279,9 +335,10 @@ def get_data(filters):
 		""".format(pd[5])
 		buying__sql = frappe.db.sql(buying_data_sql, as_list=1)
 		if len(buying__sql) == 0:
-			buying__sql = [["", "", "", "", ""]]
+			buying__sql = [["", "", "", "", "", ""]]
 		for bs in buying__sql:
 			buying_data.append(pd + bs)
+
 
 
 
@@ -294,16 +351,20 @@ def get_data(filters):
 			tcpl.name,
 			tcpl.planned_start_date,
 			tse2.name,
-			tse2.posting_date
+			tse2.posting_date,
+			tsed.item_code,
+			tsed.qty,
+			tsed.serial_and_batch_bundle
 		from `tabWork Order` two
 		left join `tabPick List FG Work Orders` tplfwo on tplfwo.work_order = two.name
 		left join `tabConsolidated Pick List` tcpl on tcpl.name = tplfwo.parent and tcpl.purpose = "Material Transfer for Manufacture"
 		left join `tabStock Entry` tse2 on tse2.consolidated_pick_list = tcpl.name and tse2.stock_entry_type = "Material Transfer for Manufacture"
+		left join `tabStock Entry Detail` tsed on tsed.parent = tse2.name
 		where two.production_planning_with_lead_time = '{0}'
 		""".format(bd[5])
 		work_order_sql_data = frappe.db.sql(work_order_sql, as_list=1)
 		if len(buying__sql) == 0:
-			buying__sql = [["", "", "", "", "",""]]
+			buying__sql = [["", "", "", "", "","", "", "", ""]]
 		for ws in work_order_sql_data:
 			work_order_data.append(bd + ws)
 
@@ -316,21 +377,25 @@ def get_data(filters):
 			tcpl2.planned_start_date,
 			tse.name,
 			tse.posting_date,
+			tsed2.item_code,
+			tsed2.qty,
+			tsed2.serial_and_batch_bundle,
 			tdn.name,
 			tdn.posting_date,
 			tdni.item_code,
-			tdni.qty
+			tdni.qty,
+			tdni.serial_and_batch_bundle
 		from `tabConsolidated Pick List` tcpl2
 		left join `tabPick List FG Work Orders` tplfwo on tplfwo.parent = tcpl2.name
 		left join `tabStock Entry` tse on tse.consolidated_pick_list = tcpl2.name and tse.stock_entry_type = "Manufacture"
-		
+		left join `tabStock Entry Detail` tsed2 on tsed2.parent = tse.name
 		left join `tabDelivery Note Item` tdni on tdni.parent = '{1}'
 		left join `tabDelivery Note` tdn on tdn.name = tdni.parent
 		where tplfwo.work_order = '{0}' and tcpl2.purpose = "Material Transfer for Manufacture"
 		""".format(wd[14], wd[0])
 		stock_sql_data = frappe.db.sql(stock_sql, as_list=1)
 		if len(stock_sql_data) == 0:
-			stock_sql_data = [["", "", "", "", "","","",""]]
+			stock_sql_data = [["", "", "", "", "","","","", "","","", ""]]
 		for sd in stock_sql_data:
 			stock_data.append(wd + sd)
 

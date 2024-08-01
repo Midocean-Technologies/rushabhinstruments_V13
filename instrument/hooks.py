@@ -129,7 +129,7 @@ doc_events = {
 	# "on_update_after_submit": "instrument.instrument.custom_instrument.bom.bom.disable_old_boms"
 	},
 	"Work Order" : {
-	"after_insert" : ["instrument.instrument.custom_instrument.work_order.work_order.check_stock","instrument.instrument.custom_instrument.work_order.work_order.after_insert"],
+	"after_insert" : ["instrument.instrument.custom_instrument.work_order.work_order.check_stock"],
 	"on_update_after_submit" : ["instrument.instrument.custom_instrument.work_order.work_order.check_stock"],
 	"on_update" : ["instrument.instrument.custom_instrument.work_order.work_order.check_stock"],
 	"validate" : ["instrument.instrument.custom_instrument.work_order.work_order.add_bom_level","instrument.instrument.custom_instrument.work_order.work_order.validate"],
@@ -172,7 +172,7 @@ doc_events = {
  	"on_trash":"instrument.instrument.custom_instrument.material_request.material_request.on_trash"
  	},
  	"Job Card":{
- 	"validate":["instrument.instrument.custom_instrument.job_card.job_card.validate"],
+ 	# "validate":["instrument.instrument.custom_instrument.job_card.job_card.validate"],
  	"after_insert":"instrument.instrument.custom_instrument.job_card.job_card.after_insert"
  	},
  	"Pick List":{

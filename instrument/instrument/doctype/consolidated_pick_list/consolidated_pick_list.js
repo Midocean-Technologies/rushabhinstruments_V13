@@ -114,7 +114,7 @@ frappe.ui.form.on('Consolidated Pick List', {
 	// },
 
 	purpose: (frm) => {
-		if ((frm.doc.purpose == 'Material Transfer for Manufacture By FG') || (frm.doc.purpose == 'Manufacture By FG')){
+		if ((frm.doc.purpose == 'Material Transfer for Manufacture By FG') || (frm.doc.purpose == 'Manufacture By FG') || (frm.doc.purpose == 'Material Transfer for Manufacture By Work Order') || (frm.doc.purpose == 'Manufacture By Work Order')){
 			frm.set_value("naming_series", "WO-PICK-.YYYY.-")
 		} else if (frm.doc.purpose == 'Sales Order Fulfillment') {
 			frm.set_value("naming_series", "SO-PICK-.YYYY.-")

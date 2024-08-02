@@ -12,10 +12,27 @@ frappe.query_reports["Traceability Report"] = {
 			options: "Item",
 		},
 		{
+			fieldname: "item_name",
+			label: __("Item Name"),
+			fieldtype: "Date"
+		},
+		{
 			fieldname: "batch",
 			label: __("Batch"),
 			fieldtype: "Link",
 			options: "Batch",
+		},
+		{
+			fieldname: "customer",
+			label: __("Customer"),
+			fieldtype: "Link",
+			options: "Customer",
+		},
+		{
+			fieldname: "supplier",
+			label: __("Supplier"),
+			fieldtype: "Link",
+			options: "Supplier",
 		},
 		{
 			fieldname: "doctype",

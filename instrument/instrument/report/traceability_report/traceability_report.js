@@ -39,6 +39,11 @@ frappe.query_reports["Traceability Report"] = {
 			label: __("Document Type"),
 			fieldtype: "Link",
 			options: "DocType",
+			get_query: function () {
+				return {
+					filters: { name: ["in", ["Sales Order", "Purchase Order", "Material Request", "Stock Entry"]] },
+				};
+			},
 		},
 		{
 			fieldname: "doctype_name",

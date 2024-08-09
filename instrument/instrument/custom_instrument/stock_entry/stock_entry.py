@@ -123,22 +123,22 @@ def on_submit(doc,method):
 	doc_status = []
 	if doc.consolidated_pick_list:
 		con_doc = frappe.get_doc("Consolidated Pick List", doc.consolidated_pick_list)
-		if con_doc.purpose in ['Manufacture By FG','Manufacture By Work Order']:
-			sub_assembly_data = frappe.db.sql("""SELECT item_code,item_name,item_group,stock_uom,uom,t_warehouse,work_order,batch_no,qty from `tabStock Entry` se join `tabStock Entry Detail` sed on sed.parent = se.name where se.name = '{0}' and t_warehouse is not null""".format(doc.name),as_dict=1,debug=1)
-			if sub_assembly_data:
-				for row in sub_assembly_data:
-					con_doc.append('work_order_pick_list_item',{
-						'item_code':row.item_code,
-						'item_name':row.item_name,
-						'item_group':row.item_group,
-						'work_order':row.work_order,
-						'uom':row.uom,
-						'stock_uom':row.stock_uom,
-						'batch_no':row.batch_no,
-						'picked_qty':row.qty,
-						'warehouse':row.t_warehouse
-						})
-				con_doc.save()
+		# if con_doc.purpose in ['Manufacture By FG','Manufacture By Work Order']:
+		# 	sub_assembly_data = frappe.db.sql("""SELECT item_code,item_name,item_group,stock_uom,uom,t_warehouse,work_order,batch_no,qty from `tabStock Entry` se join `tabStock Entry Detail` sed on sed.parent = se.name where se.name = '{0}' and t_warehouse is not null""".format(doc.name),as_dict=1,debug=1)
+		# 	if sub_assembly_data:
+		# 		for row in sub_assembly_data:
+		# 			con_doc.append('work_order_pick_list_item',{
+		# 				'item_code':row.item_code,
+		# 				'item_name':row.item_name,
+		# 				'item_group':row.item_group,
+		# 				'work_order':row.work_order,
+		# 				'uom':row.uom,
+		# 				'stock_uom':row.stock_uom,
+		# 				'batch_no':row.batch_no,
+		# 				'picked_qty':row.qty,
+		# 				'warehouse':row.t_warehouse
+		# 				})
+		# 		con_doc.save()
 		# 		print("=================sub_assembly_data",sub_assembly_data) 
 		for row in con_doc.work_orders:
 			if row.qty_of_finished_goods>0 and not row.stock_entry and not status:

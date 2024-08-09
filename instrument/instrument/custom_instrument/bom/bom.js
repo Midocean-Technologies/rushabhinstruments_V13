@@ -21,7 +21,10 @@ frappe.ui.form.on("BOM", {
 				var data = {doc : frm.doc.name}
 				var myJSON = JSON.stringify(data);
 				var link =  split_data[0]+"/app/mapped-bom/new-mapped-bom-1?data="+myJSON
-				window.open(link);
+				frappe.open_in_new_tab = true;
+				// window.open(link);
+				frappe.route_options = {"duplicated_from_bom":frm.doc.name};
+				frappe.set_route("Form","Mapped BOM")
 				// frappe.call({
 				// 	method : "instrument.instrument.custom_instrument.bom.bom.duplicate_bom",
 				// 	args : {

@@ -214,7 +214,7 @@ def get_date_list(calulated_lead_time_in_days):
 	return final_date_list
 @frappe.whitelist()
 def get_sub_assembly_items_final(bom_no, bom_data_new,ohs_dict,calulated_lead_time_in_days,indent=1):
-	data = get_children('BOM', parent = bom_no)
+	data = get_children(parent = bom_no)
 	item_dict = {item.item_code:item.stock_qty for item in data}
 	final_data = []
 	count = 0
@@ -705,7 +705,7 @@ def get_date_data(start_dt,end_dt):
 
 @frappe.whitelist()
 def get_sub_assembly_item(bom_no, bom_data,indent=0):
-	data = get_children('BOM', parent = bom_no)
+	data = get_children(parent = bom_no)
 	for d in data:
 		if d.expandable:
 			if d.value:

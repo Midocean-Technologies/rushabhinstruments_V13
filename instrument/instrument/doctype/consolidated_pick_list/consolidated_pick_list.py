@@ -938,7 +938,7 @@ class ConsolidatedPickList(Document):
 
 		# batch_data = frappe.db.sql("""SELECT b.name,b.item, `tabStock Ledger Entry`.warehouse, sum(`tabStock Ledger Entry`.actual_qty) as qty from `tabBatch` b join `tabStock Ledger Entry` ignore index (item_code, warehouse) on (b.name = `tabStock Ledger Entry`.batch_no ) where `tabStock Ledger Entry`.item_code in {0}  and (b.expiry_date >= CURDATE() or b.expiry_date IS NULL) and `tabStock Ledger Entry`.warehouse != '{1}'  group by batch_id order by b.expiry_date ASC, b.creation ASC""".format(item_list, wip_warehouse),as_dict=1,debug=1)
 
-		batch_data = frappe.db.sql("""SELECT b.name,b.item,sle.warehouse, sum(sle.actual_qty) as qty from `tabBatch` b ,`tabSerial and Batch Entry` sbe, `tabStock Ledger Entry` sle where sle.serial_and_batch_bundle = sbe.parent and sbe.batch_no = b.name and sle.item_code in {0}  and (b.expiry_date >= CURDATE() or b.expiry_date IS NULL) and sle.warehouse != '{1}'  group by b.name order by b.expiry_date ASC, b.creation ASC""".format(item_list, wip_warehouse),as_dict=1,debug=1)
+		batch_data = frappe.db.sql("""SELECT b.name,b.item,sle.warehouse, sum(sle.actual_qty) as qty from `tabBatch` b ,`tabSerial and Batch Entry` sbe, `tabStock Ledger Entry` sle where sle.serial_and_batch_bundle = sbe.parent and sbe.batch_no = b.name and sle.item_code in {0}  and (b.expiry_date >= CURDATE() or b.expiry_date IS NULL) group by b.name order by b.expiry_date ASC, b.creation ASC""".format(item_list, wip_warehouse),as_dict=1,debug=1)
 		
 		for row in batch_data:
 			calculate_remaining_so_batch_qty(row)
@@ -1487,8 +1487,8 @@ def get_so_and_po_item_locations(self, item, company, qty, order, main_item_code
 	item_locations_dict = dict()
 	wip_warehouse = frappe.db.get_single_value("Manufacturing Settings", "default_wip_warehouse")
 	warehouses = [x.get('name') for x in frappe.get_list("Warehouse", {'company': company}, "name")]
-	if wip_warehouse in warehouses:
-		warehouses.remove(wip_warehouse)
+	# if wip_warehouse in warehouses:
+	# 	warehouses.remove(wip_warehouse)
 	if item:
 		item_locations = frappe.get_all('Bin',
 							fields=['warehouse', 'actual_qty as qty'],
@@ -1600,7 +1600,6 @@ def get_child_boms(bom,bom_childs):
 def get_all_boms_in_order(bom_childs):
 	if len(bom_childs)>=1:
 		final_list = [row.get('bom') for row in bom_childs if row.get("bom")]
-		print("===========final_list",final_list)
 		final_list = '(' + ','.join("'{}'".format(i) for i in final_list) + ')'
 		childs = frappe.db.sql("""SELECT b.name as bom,b.bom_level from `tabBOM` b where b.name in {0} order by b.bom_level asc""".format(final_list),as_dict=1)
 		return childs
@@ -1756,6 +1755,17 @@ def create_stock_entry(work_order, consolidated_pick_list, row_name):
 											# "t_warehouse": work_order_doc.fg_warehouse,
 											'batch_no' : row.name,
 										})
+										pick_list_doc.append('work_order_pick_list_item',{
+											'item_code':row.item,
+											# 'item_name':row.item_name,
+											# 'item_group':row.item_group,
+											'work_order':work_order,
+											# 'uom':row.uom,
+											# 'stock_uom':row.stock_uom,
+											'batch_no':row.name,
+											'picked_qty':row.qty,
+											'warehouse':row.warehouse
+										})
 									else:
 										stock_entry.append("items",{
 											"item_code": row.item,
@@ -1764,14 +1774,29 @@ def create_stock_entry(work_order, consolidated_pick_list, row_name):
 											# "t_warehouse": work_order_doc.fg_warehouse,
 											'batch_no' : row.name,
 										})
+										pick_list_doc.append('work_order_pick_list_item',{
+											'item_code':row.item,
+											# 'item_name':row.item_name,
+											# 'item_group':row.item_group,
+											'work_order':work_order,
+											# 'uom':row.uom,
+											# 'stock_uom':row.stock_uom,
+											'batch_no':row.name,
+											'picked_qty':row.qty,
+											'warehouse':row.warehouse
+										})
 					stock_entry.append("items",{
 						"item_code":work_order_doc.production_item,
 						"qty": qty_of_finish_good,
 						"t_warehouse": work_order_doc.fg_warehouse
 					})	
 					stock_entry.save()
+					pick_list_doc.save()
+					if stock_entry.name:
+						sub_assembly_data = frappe.db.sql("""SELECT item_code,item_name,item_group,stock_uom,uom,t_warehouse,work_order,batch_no from `tabStock Entry` se join `tabStock Entry Detail` sed on sed.parent = se.name where se.name = '{0}' and t_warehouse is not null""".format(stock_entry.name),as_dict=1,debug=1)
 				frappe.db.set_value("Pick Orders", {"name":row_name}, {"stock_entry":stock_entry.name, "stock_entry_status":"Draft"})
-				frappe.db.commit()	
+				frappe.db.commit()
+					
 				return stock_entry.name
 			# else:
 			# 	frappe.throw("Please Pick Quantity For Atleast One Item")
@@ -2120,7 +2145,7 @@ def get_work_order_for_pick_list(doctype, txt, searchfield, start, page_len, fil
 	if filters.get("purpose") == "Material Transfer for Manufacture By FG":
 		return frappe.db.sql(""" SELECT wo.name FROM `tabWork Order` wo join `tabItem` i on i.item_code = wo.production_item where wo.status in ('Not Started','In Process') and wo.skip_transfer = 0 and wo.planned_start_date >= '{0}' and i.item_group in ('{1}')""".format(todays_date,fg_item_groups),debug=1)
 	elif filters.get("purpose") == "Manufacture By FG":
-		return frappe.db.sql(""" SELECT wo.name FROM `tabWork Order` wo join `tabItem` i on i.item_code == wo.production_item  where wo.status in ('Not Started','In Process') and wo.skip_transfer = 1 or wo.material_transferred_for_manufacturing > 0 or wo.produced_qty < wo.qty and wo.planned_start_date >= '{0}' and i.item_group in ('{1}')""".format(todays_date,fg_item_groups),debug=1)
+		return frappe.db.sql(""" SELECT wo.name FROM `tabWork Order` wo join `tabItem` i on i.item_code = wo.production_item  where wo.status in ('Not Started','In Process') and wo.skip_transfer = 1 or wo.material_transferred_for_manufacturing > 0 or wo.produced_qty < wo.qty and wo.planned_start_date >= '{0}' and i.item_group in ('{1}')""".format(todays_date,fg_item_groups),debug=1)
 	elif filters.get("purpose") == "Material Transfer for Manufacture By Work Order":
 		return frappe.db.sql(""" SELECT wo.name FROM `tabWork Order` wo join `tabItem` i on i.item_code = wo.production_item where wo.status in ('Not Started','In Process') and wo.skip_transfer = 0 and wo.planned_start_date >= '{0}'""".format(todays_date),debug=1)
 	else:

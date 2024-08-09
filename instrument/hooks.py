@@ -140,7 +140,7 @@ doc_events = {
 	},
 	"Item" : {
 	"validate" :["instrument.instrument.custom_instrument.item.item.validate"],
-	"on_update":"instrument.instrument.custom_instrument.item.item.disable_old_boms",
+	# "on_update":"instrument.instrument.custom_instrument.item.item.disable_old_boms",
 	"after_insert":"instrument.instrument.custom_instrument.item.item.after_insert"
 	},
 	"Production Plan":{

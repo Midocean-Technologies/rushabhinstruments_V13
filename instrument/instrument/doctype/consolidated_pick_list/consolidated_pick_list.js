@@ -443,11 +443,11 @@ frappe.ui.form.on('Consolidated Pick List', {
 	work_orders_on_form_rendered:function(frm,cdt,cdn){
 		var row = locals[cdt][cdn]
 		var stock_entry_status = frm.open_grid_row().get_field('stock_entry_status').value
-		if(stock_entry_status=="Not Created"){
-			frm.open_grid_row().set_field_property("create_stock_entry", 'hidden', false)
-		} else {
-			frm.open_grid_row().set_field_property("create_stock_entry", 'hidden', true)
-		}
+		// if(stock_entry_status=="Not Created"){
+		// 	frm.open_grid_row().set_field_property("create_stock_entry", 'hidden', false)
+		// } else {
+		// 	frm.open_grid_row().set_field_property("create_stock_entry", 'hidden', true)
+		// }
 	}
 
 });

@@ -459,6 +459,7 @@ def get_sales_order_data(filters):
 			from `tabSales Order Item`tsoi 
 			left join `tabSales Order` tso on tso.name = tsoi.parent
 			Where 1 =1 AND tso.docstatus = 1 AND tso.status != 'Closed' {0} """.format(cond)
+	print(query)
 	data = frappe.db.sql(query, as_dict=1)
 	return data
 
@@ -483,6 +484,7 @@ def get_production_plan_data(so_data):
 	left join `tabProduction Planning With Lead Time` tppwlt on tppwlt.name = tsot.parent 
 	where 1 = 1 {0}
 	""".format(so_cond)
+	print(query)
 	data = frappe.db.sql(query, as_dict=1)
 	return data
 
@@ -497,19 +499,21 @@ def get_material_request_data(filters, pp_data):
 		if len(pp_name_list) == 1:
 			cond += "AND tmr.production_planning_with_lead_time = '{0}'".format(pp_name_list[0])
 		else:
-			cond += "AND tmr.production_planning_with_lead_time in {0}".format(tuple(pp_name_list))
+			cond += " AND tmr.production_planning_with_lead_time in {0}".format(tuple(pp_name_list))
 
-	if filters.get("item_code") and frappe.db.exists("Material Request Item", {"item_code": filters.get("item_code")}):
-		cond += "AND tmr.item_code = '{0}'".format(filters.get("item_code"))
+	# if filters.get("item_code") and frappe.db.exists("Material Request Item", {"item_code": filters.get("item_code")}):
+	# 	cond += " AND tmri.item_code = '{0}'".format(filters.get("item_code"))
 
 	query = """
 		select 
 		tmr.name as mr_name,
 		tmr.transaction_date as mr_date,
 		tmr.production_planning_with_lead_time as pp_name
-	from `tabMaterial Request` tmr 
+	from `tabMaterial Request` tmr
 	where 1 = 1 {0}
 	""".format(cond)
+
+	print(query)
 	data = frappe.db.sql(query, as_dict=1)
 	return data
 
@@ -541,6 +545,7 @@ def get_purchase_order_data(filters,mr_data):
 	left join `tabPurchase Order` tpo on tpo.name = tpoi.parent 
 	where 1 = 1 {0}
 	""".format(cond)
+	print(query)
 	data = frappe.db.sql(query, as_dict=1)
 	return data
 
@@ -573,6 +578,7 @@ def get_purchase_receipt_data(filters, po_data):
 	left join `tabPurchase Receipt` tpr on tpr.name = tpri.parent 
 	where 1 = 1 {0}
 	""".format(cond)
+	print(query)
 	data = frappe.db.sql(query, as_dict=1)
 	return data
 
@@ -594,6 +600,7 @@ def get_work_order_data(filters, pp_data):
 	from `tabWork Order` two 
 	where 1 = 1 {0}
 	""".format(cond)
+	print(query)
 	data = frappe.db.sql(query, as_dict=1)
 	return data
 
@@ -617,6 +624,7 @@ def get_pick_list_for_mt(filters, wo_data):
 		left join `tabConsolidated Pick List` tcpl on tcpl.name = tpo.parent
 		where 1 = 1 {0} and tcpl.purpose = "Material Transfer for Manufacture"
 	""".format(cond)
+	print(query)
 	data = frappe.db.sql(query, as_dict=1)
 	return data
 
@@ -643,6 +651,7 @@ def get_stock_entry_for_mt(filters, pick_list_for_mt_data):
 		left join `tabStock Entry` tse on tse.name = tsed.parent
 		where 1 = 1 {0} and tse.stock_entry_type = "Material Transfer for Manufacture"
 	""".format(cond)
+	print(query)
 	data = frappe.db.sql(query, as_dict=1)
 	return data
 
@@ -666,6 +675,7 @@ def get_pick_list_for_manu(filters, wo_data):
 		left join `tabConsolidated Pick List` tcpl on tcpl.name = tpo.parent
 		where 1 = 1 {0} and tcpl.purpose = "Manufacture"
 	""".format(cond)
+	print(query)
 	data = frappe.db.sql(query, as_dict=1)
 	return data
 
@@ -692,6 +702,7 @@ def get_stock_entry_for_manu(filters, pick_list_for_mt_data):
 		left join `tabStock Entry` tse on tse.name = tsed.parent
 		where 1 = 1 {0} and tse.stock_entry_type = "Manufacture"
 	""".format(cond)
+	print(query)
 	data = frappe.db.sql(query, as_dict=1)
 	return data
 
@@ -717,6 +728,7 @@ def get_delivery_note_data(filters, so_data):
 		left join `tabDelivery Note` tdn on tdn.name = tdni.parent
 		where 1 = 1 {0}
 	""".format(cond)
+	print(query)
 	data = frappe.db.sql(query, as_dict=1)
 	return data
 

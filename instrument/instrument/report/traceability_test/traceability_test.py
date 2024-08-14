@@ -90,7 +90,7 @@ def get_data(filters):
 						'document_date': so_rec.get("so_date"),
 						'party_name': so_rec.get("customer_name"),
 						'item_code': so_rec.get("so_item_code"),
-						'item_name': "",
+						'item_name': so_rec.get("so_item_name"),
 						'qty': so_rec.get("so_item_qty"),
 						'batch': ''
 					}
@@ -109,13 +109,26 @@ def get_data(filters):
 					}
 				)
 		pp_list = []
+		data.append(
+					{
+						'document_type': 'Production Plan With Lead Time',
+						'document_name': '',
+						'indent': 2,
+						'document_date': '',
+						'party_name': '',
+						'item_code': '',
+						'item_name': "",
+						'qty': '',
+						'batch': ''
+					}
+				)
 		for pp_rec in pp_data:
 			if so_rec.get("so_name") == pp_rec.get("pp_so_name"):
 				data.append(
 						{
 							'document_type': 'Production Plan With Lead Time',
 							'document_name': pp_rec.get("production_plan_name"),
-							'indent': 2,
+							'indent': 3,
 							'document_date': pp_rec.get("production_plan_date"),
 							'party_name': "",
 							'item_code': "",
@@ -127,13 +140,26 @@ def get_data(filters):
 				pp_list.append(pp_rec.get("production_plan_name"))
 				
 		mr_list = []
+		data.append(
+					{
+						'document_type': 'Material Request',
+						'document_name': '',
+						'indent': 2,
+						'document_date': '',
+						'party_name': '',
+						'item_code': '',
+						'item_name': "",
+						'qty': '',
+						'batch': ''
+					}
+				)
 		for mr_rec in mr_data:
 			if mr_rec.get("pp_name") in pp_list:
 				data.append(
 				{
 					'document_type': 'Material Request',
 					'document_name': mr_rec.get("mr_name"),
-					'indent': 2,
+					'indent': 3,
 					'document_date': mr_rec.get("mr_date"),
 					'party_name': "",
 					'item_code': "",
@@ -145,13 +171,26 @@ def get_data(filters):
 				mr_list.append(mr_rec.get("mr_name"))
 
 		po_list = []
+		data.append(
+					{
+						'document_type': 'Purchase Order',
+						'document_name': '',
+						'indent': 2,
+						'document_date': '',
+						'party_name': '',
+						'item_code': '',
+						'item_name': "",
+						'qty': '',
+						'batch': ''
+					}
+				)
 		for po_rec in po_data:
 			if po_rec.get("po_mr_name") in mr_list:
 				data.append(
 				{
 					'document_type': 'Purchase Order',
 					'document_name': po_rec.get("po_name"),
-					'indent': 2,
+					'indent': 3,
 					'document_date': po_rec.get("po_date"),
 					'party_name': po_rec.get("po_supplier"),
 					'item_code': "",
@@ -163,19 +202,32 @@ def get_data(filters):
 				po_list.append(po_rec.get("po_name"))
 		
 		pr_list = []
+		data.append(
+					{
+						'document_type': 'Purchase Receipt',
+						'document_name': '',
+						'indent': 2,
+						'document_date': '',
+						'party_name': '',
+						'item_code': '',
+						'item_name': "",
+						'qty': '',
+						'batch': ''
+					}
+				)
 		for pr_rec in pr_data:
 			if pr_rec.get("pr_po_name") in po_list:
 				data.append(
 				{
 					'document_type': 'Purchase Receipt',
 					'document_name': pr_rec.get("pr_name"),
-					'indent': 2,
+					'indent': 3,
 					'document_date': pr_rec.get("pr_date"),
 					'party_name': pr_rec.get("pr_supplier"),
 					'item_code': pr_rec.get("pr_item_code"),
 					'item_name': pr_rec.get("pr_item_name"),
 					'qty': pr_rec.get("pr_qty"),
-					'batch': ''
+					'batch': pr_rec.get("pr_batch_bundle")
 					}
 				)
 				pr_list.append(pr_rec.get("pr_name"))
@@ -195,13 +247,26 @@ def get_data(filters):
 				)
 
 		wo_list = []
+		data.append(
+					{
+						'document_type': 'Work Order',
+						'document_name': '',
+						'indent': 2,
+						'document_date': '',
+						'party_name': '',
+						'item_code': '',
+						'item_name': "",
+						'qty': '',
+						'batch': ''
+					}
+				)
 		for wo_rec in wo_data:
 			if wo_rec.get("wo_pp") in pp_list:
 				data.append(
 				{
 					'document_type': 'Work Order',
 					'document_name': wo_rec.get("wo_name"),
-					'indent': 2,
+					'indent': 3,
 					'document_date': wo_rec.get("wo_date"),
 					'party_name': "",
 					'item_code': wo_rec.get("wo_item_code"),
@@ -214,13 +279,26 @@ def get_data(filters):
 
 		
 		pl_mt_list = []
+		data.append(
+					{
+						'document_type': 'Consolidated Pick List (Material Trasfer)',
+						'document_name': '',
+						'indent': 2,
+						'document_date': '',
+						'party_name': '',
+						'item_code': '',
+						'item_name': "",
+						'qty': '',
+						'batch': ''
+					}
+				)
 		for pl_mt_rec in pick_list_for_mt_data:
 			if pl_mt_rec.get("pl_mt_wo") in wo_list:
 				data.append(
 				{
 					'document_type': 'Consolidated Pick List (Material Trasfer)',
 					'document_name': pl_mt_rec.get("mt_pick_list_name"),
-					'indent': 2,
+					'indent': 3,
 					'document_date': pl_mt_rec.get("mt_pick_list_date"),
 					'party_name': "",
 					'item_code': "",
@@ -233,31 +311,57 @@ def get_data(filters):
 
 
 		se_mt_list = []
+		data.append(
+					{
+						'document_type': 'Stock Entry (Material Trasfer)',
+						'document_name': '',
+						'indent': 2,
+						'document_date': '',
+						'party_name': '',
+						'item_code': '',
+						'item_name': "",
+						'qty': '',
+						'batch': ''
+					}
+				)
 		for se_mt_rec in stock_entry_for_mt_data:
 			if se_mt_rec.get("se_mt_pl") in pl_mt_list:
 				data.append(
 				{
 					'document_type': 'Stock Entry (Material Trasfer)',
 					'document_name': se_mt_rec.get("se_mt_name"),
-					'indent': 2,
+					'indent': 3,
 					'document_date': se_mt_rec.get("se_mt_date"),
 					'party_name': "",
 					'item_code': se_mt_rec.get("se_mt_item"),
 					'item_name': se_mt_rec.get("se_mt_item_name"),
 					'qty': se_mt_rec.get("se_mt_qty"),
-					'batch': ''
+					'batch': se_mt_rec.get("se_mt_batch_bundle")
 					}
 				)
 				se_mt_list.append(se_mt_rec.get("se_mt_name"))
 		
 		pl_manu_list = []
+		data.append(
+					{
+						'document_type': 'Consolidated Pick List (Manufacture)',
+						'document_name': '',
+						'indent': 2,
+						'document_date': '',
+						'party_name': '',
+						'item_code': '',
+						'item_name': "",
+						'qty': '',
+						'batch': ''
+					}
+				)
 		for pl_manu_rec in pick_list_for_manu_data:
 			if pl_manu_rec.get("manu_wo") in wo_list:
 				data.append(
 				{
 					'document_type': 'Consolidated Pick List (Manufacture)',
 					'document_name': pl_manu_rec.get("manu_pick_list_name"),
-					'indent': 2,
+					'indent': 3,
 					'document_date': pl_manu_rec.get("manu_pick_list_date"),
 					'party_name': "",
 					'item_code': "",
@@ -270,41 +374,66 @@ def get_data(filters):
 
 
 		se_manu_list = []
+		data.append(
+					{
+						'document_type': 'Stock Entry (Manufacture)',
+						'document_name': '',
+						'indent': 2,
+						'document_date': '',
+						'party_name': '',
+						'item_code': '',
+						'item_name': "",
+						'qty': '',
+						'batch': ''
+					}
+				)
 		for se_manu_rec in stock_entry_for_manu_data:
 			if se_manu_rec.get("se_manu_pl") in pl_manu_list:
 				data.append(
 				{
 					'document_type': 'Stock Entry (Manufacture)',
 					'document_name': se_manu_rec.get("se_manu_name"),
-					'indent': 2,
+					'indent': 3,
 					'document_date': se_manu_rec.get("se_manu_date"),
 					'party_name': "",
 					'item_code': se_manu_rec.get("se_manu_item"),
 					'item_name': se_manu_rec.get("se_manu_item_name"),
 					'qty': se_manu_rec.get("se_manu_qty"),
-					'batch': ''
+					'batch': se_manu_rec.get("se_manu_batch_bundle")
 					}
 				)
 				se_manu_list.append(se_manu_rec.get("se_manu_name"))
 
 		dl_note_list = []
+		data.append(
+					{
+						'document_type': 'Delivery Note',
+						'document_name': '',
+						'indent': 2,
+						'document_date': '',
+						'party_name': '',
+						'item_code': '',
+						'item_name': "",
+						'qty': '',
+						'batch': ''
+					}
+				)
 		for delivery_note_rec in delivery_note_data:
 			if delivery_note_rec.get("dn_so") == so_rec.get("so_name"):
 				data.append(
 				{
 					'document_type': 'Delivery Note',
 					'document_name': delivery_note_rec.get("dn_name"),
-					'indent': 2,
+					'indent': 3,
 					'document_date': delivery_note_rec.get("dn_date"),
 					'party_name': "",
 					'item_code': delivery_note_rec.get("dn_item"),
 					'item_name': delivery_note_rec.get("dn_item_name"),
 					'qty': delivery_note_rec.get("dn_qty"),
-					'batch': ''
+					'batch': delivery_note_rec.get("dn_batch_bundle")
 					}
 				)
 				dl_note_list.append(delivery_note_rec.get("dn_name"))
-
 
 	return data
 
@@ -328,10 +457,11 @@ def get_sales_order_data(filters):
 			tso.transaction_date as so_date,
 			tso.customer_name,
 			tsoi.item_code as so_item_code,
+			tsoi.item_name as so_item_name,
 			tsoi.qty as so_item_qty
 			from `tabSales Order Item`tsoi 
 			left join `tabSales Order` tso on tso.name = tsoi.parent
-			Where 1 =1 AND tso.docstatus = 1 AND tso.status != 'Closed' {0} """.format(cond)
+			Where 1 =1 AND tso.docstatus = 1 AND tso.status != 'Closed' {0} ORDER BY tso.name DESC""".format(cond)
 	print(query)
 	data = frappe.db.sql(query, as_dict=1)
 	return data
@@ -448,7 +578,7 @@ def get_purchase_receipt_data(filters, po_data):
 		tpri.item_code as pr_item_code,
 		tpri.item_name as pr_item_name,
 		tpri.qty as pr_qty,
-		tpri.serial_and_batch_bundle as pr_batch_bundle,
+		(select tsabe.batch_no from `tabSerial and Batch Entry` tsabe left join `tabSerial and Batch Bundle` tsabb on tsabb.name = tsabe.parent WHERE tsabb.voucher_type = "Purchase Receipt" and tsabb.voucher_no = tpr.name and tsabb.item_code = tpri.item_code GROUP BY tsabe.batch_no) as pr_batch_bundle,
 		tpri.purchase_order as pr_po_name
 	from `tabPurchase Receipt Item` tpri
 	left join `tabPurchase Receipt` tpr on tpr.name = tpri.parent 
@@ -525,7 +655,7 @@ def get_stock_entry_for_mt(filters, pick_list_for_mt_data):
 		tsed.item_code as se_mt_item,
 		tsed.item_name as se_mt_item_name,
 		tsed.qty as se_mt_qty,
-		tsed.serial_and_batch_bundle as se_mt_bundle,
+		(select tsabe.batch_no from `tabSerial and Batch Entry` tsabe left join `tabSerial and Batch Bundle` tsabb on tsabb.name = tsabe.parent WHERE tsabb.voucher_type = "Stock Entry" and tsabb.voucher_no = tse.name and tsabb.item_code = tsed.item_code GROUP BY tsabe.batch_no) as se_mt_batch_bundle,
 		tse.consolidated_pick_list as se_mt_pl
 		from `tabStock Entry Detail` tsed
 		left join `tabStock Entry` tse on tse.name = tsed.parent
@@ -577,7 +707,7 @@ def get_stock_entry_for_manu(filters, pick_list_for_mt_data):
 		tsed.item_code as se_manu_item,
 		tsed.item_name as se_manu_item_name,
 		tsed.qty as se_manu_qty,
-		tsed.serial_and_batch_bundle as se_manu_bundle,
+		(select tsabe.batch_no from `tabSerial and Batch Entry` tsabe left join `tabSerial and Batch Bundle` tsabb on tsabb.name = tsabe.parent WHERE tsabb.voucher_type = "Stock Entry" and tsabb.voucher_no = tse.name and tsabb.item_code = tsed.item_code GROUP BY tsabe.batch_no) as se_manu_batch_bundle,
 		tse.consolidated_pick_list as se_manu_pl
 		from `tabStock Entry Detail` tsed
 		left join `tabStock Entry` tse on tse.name = tsed.parent
@@ -604,7 +734,7 @@ def get_delivery_note_data(filters, so_data):
  			tdni.item_code as dn_item,
  			tdni.item_name as dn_item_name,
  			tdni.qty as dn_qty,
- 			tdni.serial_and_batch_bundle as dn_bundle,
+ 			(select tsabe.batch_no from `tabSerial and Batch Entry` tsabe left join `tabSerial and Batch Bundle` tsabb on tsabb.name = tsabe.parent WHERE tsabb.voucher_type = "Delivery Note" and tsabb.voucher_no = tdn.name and tsabb.item_code = tdni.item_code GROUP BY tsabe.batch_no) as dn_batch_bundle,
 			tdni.against_sales_order as dn_so
 		from `tabDelivery Note Item` tdni
 		left join `tabDelivery Note` tdn on tdn.name = tdni.parent

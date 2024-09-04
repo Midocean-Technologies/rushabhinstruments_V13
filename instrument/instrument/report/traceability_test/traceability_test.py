@@ -67,7 +67,8 @@ def get_column():
 
 
 def get_data(filters):
-	so_data = get_sales_order_data(filters)
+	filters_so = get_so_base_on_filter(filters)
+	so_data = get_sales_order_data(filters, filters_so)
 	pp_data = get_production_plan_data(so_data)
 	mr_data = get_material_request_data(filters, pp_data)
 	po_data = get_purchase_order_data(filters, mr_data)
@@ -435,12 +436,15 @@ def get_data(filters):
 				)
 				dl_note_list.append(delivery_note_rec.get("dn_name"))
 
+	# print(data)
 	return data
 
 
 
 
-def get_sales_order_data(filters):
+def get_sales_order_data(filters, filters_so=None):
+
+	print("78888888888888888888888888888888", filters_so)
 	cond = ""
 	if filters.get('customer'):
 		cond += "AND tso.customer = '{0}'".format(filters.get('customer'))
@@ -451,6 +455,15 @@ def get_sales_order_data(filters):
 	if filters.get("doctype") == "Sales Order" and filters.get("doctype_name"):
 		cond += "AND tso.name = '{0}'".format(filters.get("doctype_name"))
 
+	if filters.get("item_code") or filters.get("batch"):
+		if filters_so and len(filters_so) > 0:
+			if len(filters_so) == 1:
+				cond += "AND tso.name = '{0}'".format(filters_so[0])
+			else:
+				cond += "AND tso.name in {0}".format(tuple(filters_so))
+		else:
+			cond += "AND tso.name in (' ')"
+	
 	query =  """
 			select 
 			tso.name as so_name,
@@ -743,3 +756,62 @@ def get_delivery_note_data(filters, so_data):
 	print(query)
 	data = frappe.db.sql(query, as_dict=1)
 	return data
+
+
+def get_so_base_on_filter(filters):
+	sales_order_name_list = []
+
+
+	item_code = None
+	batch = None
+
+
+	print(filters)
+
+	if filters.get("item_code") and filters.get("batch"):
+		item_code = filters.get("item_code")
+		batch = filters.get("batch")
+		query = """
+			SELECT 
+				tsabb.voucher_type,
+				tsabb.voucher_no 
+			from `tabSerial and Batch Entry` tsabe 
+			left join `tabSerial and Batch Bundle` tsabb on tsabe.parent = tsabb.name
+			WHERE tsabe.batch_no = '{0}' and tsabb.item_code = '{1}'""".format(batch, item_code)
+		bundle_list = frappe.db.sql(query, as_dict=1)
+		if not bundle_list:
+			return sales_order_name_list
+		else:
+			for rec in bundle_list:
+				doctype = rec.get("voucher_type")
+				docname = rec.get("voucher_no")
+
+				if doctype == "Stock Entry":
+					se_doc = frappe.get_doc(doctype, docname)
+					if se_doc.stock_entry_type in ["Material Transfer for Manufacture", "Manufacture"]:
+						so_name = frappe.get_value("Work Order", se_doc.work_order, "sales_order")
+						sales_order_name_list.append(so_name)
+				elif doctype == "Delivery Note":
+					dn_doc = frappe.get_doc(doctype, docname)
+					for i in dn_doc.items:
+						sales_order_name_list.append(i.against_sales_order)
+				elif doctype == "Purchase Receipt":
+					pr_doc = frappe.get_doc(doctype, docname)
+					mr_list = []
+					for pr_rec in pr_doc.items:
+						mr_list.append(pr_rec.material_request)
+					
+					pp_list = []
+					for i_mr in mr_list:
+						pp_list.append(frappe.get_value("Material Request", i_mr, "production_planning_with_lead_time"))
+
+					for pp_rec in pp_list:
+						pp_doc = frappe.get_doc("Production Planning With Lead Time", pp_rec)
+						for i_pp_rec in pp_doc.sales_order_table:
+							sales_order_name_list.append(i_pp_rec.sales_order)
+					# sales_order_name_list.append(so_name)
+
+				return sales_order_name_list
+
+
+

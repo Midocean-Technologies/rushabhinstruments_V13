@@ -9,11 +9,11 @@ frappe.query_reports["Traceability Test"] = {
 			fieldtype: "Link",
 			options: "Item",
 		},
-		{
-			fieldname: "item_name",
-			label: __("Item Name"),
-			fieldtype: "Date"
-		},
+		// {
+		// 	fieldname: "item_name",
+		// 	label: __("Item Name"),
+		// 	fieldtype: "Date"
+		// },
 		{
 			fieldname: "batch",
 			label: __("Batch"),

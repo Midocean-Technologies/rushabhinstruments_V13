@@ -64,10 +64,24 @@ def get_column():
 					"width": 140
 				},
 				{
+					"label": "Warehouse",
+					"fieldtype": "Link",
+					"fieldname": "warehouse",
+					"options": "Warehouse",
+					"width": 140
+				},
+				{
 					"label": "Batch",
 					"fieldtype": "Link",
 					"fieldname": "batch",
 					"options": "Batch",
+					"width": 170
+				},
+				{
+					"label": "Serial and Batch Bundle",
+					"fieldtype": "Link",
+					"fieldname": "serial_and_batch_bundle",
+					"options": "Serial and Batch Bundle",
 					"width": 170
 				}
 			]
@@ -111,6 +125,7 @@ def get_data(filters):
 					temp["mode"] = "In Work Order"
 					temp["document_type"] = "Sales Order"
 					temp["document_name"] = so_doc.name
+					temp["document_date"] = so_doc.transaction_date
 					temp["party_name"] = so_doc.customer
 					temp["item_code"] = item_code
 					temp["item_name"] = item_name
@@ -131,7 +146,8 @@ def get_data(filters):
 def collect_data(batch):
 	query = """
 		SELECT 
-			tsabb.name,
+			tsabb.name as serial_and_batch_bundle,
+			tsabb.warehouse as warehouse,
 			tsabe.batch_no as batch,
 			abs(sum(tsabe.qty)) as qty,
 			tsabb.item_code as item_code,

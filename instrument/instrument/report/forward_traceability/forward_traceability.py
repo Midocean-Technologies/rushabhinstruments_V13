@@ -13,13 +13,7 @@ def execute(filters=None):
 
 def get_column():
 	column = [
-				{
-					"label": "Mode",
-					"fieldtype": "Select",
-					"fieldname": "mode",
-					"options": "In Work Order\nSubassembly Item\nFinish Good",
-					"width": 150
-				},
+				
 				{
 					"label": "Document Type",
 					"fieldtype": "Data",
@@ -83,7 +77,14 @@ def get_column():
 					"fieldname": "serial_and_batch_bundle",
 					"options": "Serial and Batch Bundle",
 					"width": 170
-				}
+				},
+				{
+					"label": "Mode",
+					"fieldtype": "Select",
+					"fieldname": "mode",
+					"options": "In Work Order\nSubassembly Item\nFinish Good",
+					"width": 150
+				},
 			]
 	return column
 

@@ -13,13 +13,7 @@ def execute(filters=None):
 
 def get_column():
 	column = [
-				{
-					"label": "Mode",
-					"fieldtype": "Select",
-					"fieldname": "mode",
-					"options": "In Work Order\nSubassembly Item\nFinish Good",
-					"width": 150
-				},
+				
 				{
 					"label": "Document Type",
 					"fieldtype": "Data",
@@ -83,7 +77,14 @@ def get_column():
 					"fieldname": "serial_and_batch_bundle",
 					"options": "Serial and Batch Bundle",
 					"width": 170
-				}
+				},
+				{
+					"label": "Mode",
+					"fieldtype": "Select",
+					"fieldname": "mode",
+					"options": "In Work Order\nSubassembly Item\nFinish Good",
+					"width": 150
+				},
 			]
 	return column
 
@@ -100,6 +101,7 @@ def get_data(filters):
 			doc = frappe.get_doc(i.document_type, i.document_name)
 			if doc.stock_entry_type == "Material Transfer for Manufacture":
 				i["mode"] = "In Work Order"
+				i["indent"] = 0
 				report_data.append(i)
 
 				wo_doc = frappe.get_doc("Work Order", doc.work_order)
@@ -110,6 +112,7 @@ def get_data(filters):
 				temp["item_code"] = wo_doc.production_item
 				temp["item_name"] = wo_doc.item_name
 				temp["qty"] = wo_doc.qty
+				temp["indent"] = 1
 				report_data.append(temp)
 
 				if wo_doc.so_reference:
@@ -130,6 +133,7 @@ def get_data(filters):
 					temp["item_code"] = item_code
 					temp["item_name"] = item_name
 					temp["qty"] = qty
+					temp["indent"] = 2
 					report_data.append(temp)
 
 

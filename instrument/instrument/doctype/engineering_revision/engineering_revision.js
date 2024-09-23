@@ -2,6 +2,7 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Engineering Revision', {
+	
 	purchasing_package_on_form_rendered:function(frm, cdt, cdn){
 		// hide delete, insert above and insert below fields inside Scrap Finished Good child table
 		frm.fields_dict['purchasing_package'].grid.wrapper.find('.grid-delete-row').hide();
@@ -107,3 +108,23 @@ frappe.ui.form.on('Other Engineering Revisions', {
 	// 	}
 	// },
 })
+frappe.ui.form.on('Engineering Package Table', {
+	before_engineering_package_remove:function(frm){
+		frappe.throw("You cannot delete packages")
+
+	},
+})
+frappe.ui.form.on('Purchasing Package Table', {
+	before_purchasing_package_remove:function(frm){
+		frappe.throw("You cannot delete packages")
+
+	},
+})
+frappe.ui.form.on('Manufacturing Package Table', {
+	before_manufacturing_package_remove:function(frm){
+		frappe.throw("You cannot delete packages")
+
+	},
+})
+
+

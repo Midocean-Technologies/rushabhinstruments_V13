@@ -119,5 +119,17 @@ frappe.ui.form.on('Package Document', {
 		dialog.show();
 	}
 });
-
+frappe.ui.form.on('Attachment Table', {
+	before_attachment_remove:function(frm){
+		if(frm.doc.attachment[0].attachment){
+			frappe.throw("You Cannot Remove Attachment")
+		}
+		
+	},
+})
+frappe.ui.form.on('File Locations Table', {
+	before_file_locations_remove:function(frm){
+		frappe.throw("You Cannot Remove File Locations")
+	},
+})
 

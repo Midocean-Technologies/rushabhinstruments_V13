@@ -3,6 +3,7 @@
 
 frappe.ui.form.on('Mapped BOM', {
 	refresh: function(frm) {
+		var query = window.location.href
 		if(frm.doc.docstatus==0){
 			frm.doc.status = ''
 		}
@@ -238,71 +239,75 @@ frappe.ui.form.on('Mapped BOM', {
 	onload:function(frm){
 		if(frm.doc.__islocal){
 			frm.set_value("conversion_rate",1)
-		}
-		var query = window.location.href
-		var index = query.indexOf("=")
-		var string_data= query.substring(index+1)
-		var data1 = JSON.parse(decodeURIComponent(string_data));
-		if(data1){
-			frappe.call({
-				method : "instrument.instrument.custom_instrument.bom.bom.duplicate_bom",
-				args : {
-					doc : data1.doc
-				},
-				callback:function(r){
-					if(r.message){
-						var data = r.message
-						frm.doc.items = ''
-						frm.set_value('allow_alternative_item',data.allow_alternative_item)
-						frm.set_value('rm_cost_as_per',data.rm_cost_as_per)
-						frm.set_value('inspection_required',data.inspection_required)
-						frm.set_value('plc_conversion_rate',data.plc_conversion_rate)
-						frm.set_value('conversion_rate',data.conversion_rate)
-						frm.set_value('price_list_currency',data.price_list_currency)
-						frm.set_value('project',data.project)
-						frm.set_value('quantity',data.quantity)
-						frm.set_value('quality_inspection_template',data.quality_inspection_template)
-						if(data.items){
-							$.each(data.items,function(idx,item_row){
-								var row = frappe.model.add_child(frm.doc, "Mapped BOM Item", "items");
-								frappe.model.set_value(row.doctype, row.name, 'item_code', item_row['item_code']);
-								frappe.model.set_value(row.doctype, row.name, 'item_name', item_row['item_name']);
-								frappe.model.set_value(row.doctype, row.name, 'stock_uom', item_row['stock_uom']);
-								frappe.model.set_value(row.doctype, row.name, 'uom', item_row['uom']);
-								frappe.model.set_value(row.doctype, row.name, 'qty', item_row['qty']);
-								frappe.model.set_value(row.doctype, row.name, 'base_rate', item_row['base_rate']);
-								frappe.model.set_value(row.doctype, row.name, 'rate', item_row['rate']);
-								frappe.model.set_value(row.doctype, row.name, 'conversion_factor', item_row['conversion_factor']);
-							})
-							refresh_field('items')
-						}
-						if(data.operations){
-							$.each(data.operations,function(idx,item_row){
-								var row = frappe.model.add_child(frm.doc, "BOM Operation", "operations");
-								frappe.model.set_value(row.doctype, row.name, 'operation', item_row['operation']);
-								frappe.model.set_value(row.doctype, row.name, 'workstation', item_row['workstation']);
-								frappe.model.set_value(row.doctype, row.name, 'time_in_mins', item_row['time_in_mins']);
-								frappe.model.set_value(row.doctype, row.name, 'hour_rate', item_row['hour_rate']);
-								frappe.model.set_value(row.doctype, row.name, 'batch_size', item_row['batch_size']);
-								frappe.model.set_value(row.doctype, row.name, 'set_cost_based_on_bom_qty', item_row['set_cost_based_on_bom_qty']);
-							})
-							refresh_field('operations')
-						}
-						if(data.scrap_data){
-							$.each(data.scrap_data,function(idx,item_row){
-								var row = frappe.model.add_child(frm.doc, "BOM Scrap Item", "scrap_items");
-								frappe.model.set_value(row.doctype, row.name, 'item_code', item_row['item_code']);
-								frappe.model.set_value(row.doctype, row.name, 'item_name', item_row['item_name']);
-								frappe.model.set_value(row.doctype, row.name, 'is_process_loss', item_row['is_process_loss']);
-								frappe.model.set_value(row.doctype, row.name, 'stock_qty', item_row['stock_qty']);
-								frappe.model.set_value(row.doctype, row.name, 'stock_uom', item_row['stock_uom']);
-								frappe.model.set_value(row.doctype, row.name, 'rate', item_row['rate']);
-							})
-							refresh_field('scrap_items')
+			let name = frappe.route_options.duplicated_from_bom;
+	        // frm.set_value('duplicated_from_bom', name);
+			// var url = frappe.utils.get_url()
+			// var query = window.location.href
+			// var index = query.indexOf("=")
+			// var string_data= query.substring(index+1)
+			// var data1 = JSON.parse(decodeURIComponent(string_data));
+			if(frm.doc.duplicated_from_bom){
+				frappe.call({
+					method : "instrument.instrument.custom_instrument.bom.bom.duplicate_bom",
+					args : {
+						doc : frm.doc.duplicated_from_bom
+					},
+					callback:function(r){
+						if(r.message){
+							var data = r.message
+							frm.doc.items = ''
+							frm.set_value('allow_alternative_item',data.allow_alternative_item)
+							frm.set_value('rm_cost_as_per',data.rm_cost_as_per)
+							frm.set_value('inspection_required',data.inspection_required)
+							frm.set_value('plc_conversion_rate',data.plc_conversion_rate)
+							frm.set_value('conversion_rate',data.conversion_rate)
+							frm.set_value('price_list_currency',data.price_list_currency)
+							frm.set_value('project',data.project)
+							frm.set_value('quantity',data.quantity)
+							frm.set_value('quality_inspection_template',data.quality_inspection_template)
+							frm.set_value('with_operations',data.with_operations)
+							if(data.items){
+								$.each(data.items,function(idx,item_row){
+									var row = frappe.model.add_child(frm.doc, "Mapped BOM Item", "items");
+									frappe.model.set_value(row.doctype, row.name, 'item_code', item_row['item_code']);
+									frappe.model.set_value(row.doctype, row.name, 'item_name', item_row['item_name']);
+									frappe.model.set_value(row.doctype, row.name, 'stock_uom', item_row['stock_uom']);
+									frappe.model.set_value(row.doctype, row.name, 'uom', item_row['uom']);
+									frappe.model.set_value(row.doctype, row.name, 'qty', item_row['qty']);
+									frappe.model.set_value(row.doctype, row.name, 'base_rate', item_row['base_rate']);
+									frappe.model.set_value(row.doctype, row.name, 'rate', item_row['rate']);
+									frappe.model.set_value(row.doctype, row.name, 'conversion_factor', item_row['conversion_factor']);
+								})
+								refresh_field('items')
+							}
+							if(data.operations){
+								$.each(data.operations,function(idx,item_row){
+									var row = frappe.model.add_child(frm.doc, "BOM Operation", "operations");
+									frappe.model.set_value(row.doctype, row.name, 'operation', item_row['operation']);
+									frappe.model.set_value(row.doctype, row.name, 'workstation', item_row['workstation']);
+									frappe.model.set_value(row.doctype, row.name, 'time_in_mins', item_row['time_in_mins']);
+									frappe.model.set_value(row.doctype, row.name, 'hour_rate', item_row['hour_rate']);
+									frappe.model.set_value(row.doctype, row.name, 'batch_size', item_row['batch_size']);
+									frappe.model.set_value(row.doctype, row.name, 'set_cost_based_on_bom_qty', item_row['set_cost_based_on_bom_qty']);
+								})
+								refresh_field('operations')
+							}
+							if(data.scrap_data){
+								$.each(data.scrap_data,function(idx,item_row){
+									var row = frappe.model.add_child(frm.doc, "BOM Scrap Item", "scrap_items");
+									frappe.model.set_value(row.doctype, row.name, 'item_code', item_row['item_code']);
+									frappe.model.set_value(row.doctype, row.name, 'item_name', item_row['item_name']);
+									frappe.model.set_value(row.doctype, row.name, 'is_process_loss', item_row['is_process_loss']);
+									frappe.model.set_value(row.doctype, row.name, 'stock_qty', item_row['stock_qty']);
+									frappe.model.set_value(row.doctype, row.name, 'stock_uom', item_row['stock_uom']);
+									frappe.model.set_value(row.doctype, row.name, 'rate', item_row['rate']);
+								})
+								refresh_field('scrap_items')
+							}
 						}
 					}
-				}
-			})
+				})
+			}
 		}
 			
 	},

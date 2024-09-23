@@ -64,6 +64,7 @@ doctype_js = {
 # doctype_js = {"doctype" : "public/js/doctype.js"}
 doctype_list_js = {"Work Order" : "instrument/custom_instrument/work_order/work_order_list.js",
 "Purchase Order" : "instrument/custom_instrument/purchase_order/purchase_order_list.js",
+"Material Request" : "instrument/custom_instrument/material_request/material_request_list.js",
 	"BOM": "instrument/custom_instrument/bom/bom_list.js"
 }
 doctype_tree_js = {"BOM" : "instrument/custom_instrument/bom/bom_tree.js","Task":"instrument/custom_instrument/task/task_tree.js"}
@@ -128,7 +129,7 @@ doc_events = {
 	# "on_update_after_submit": "instrument.instrument.custom_instrument.bom.bom.disable_old_boms"
 	},
 	"Work Order" : {
-	"after_insert" : ["instrument.instrument.custom_instrument.work_order.work_order.check_stock","instrument.instrument.custom_instrument.work_order.work_order.after_insert"],
+	"after_insert" : ["instrument.instrument.custom_instrument.work_order.work_order.check_stock"],
 	"on_update_after_submit" : ["instrument.instrument.custom_instrument.work_order.work_order.check_stock"],
 	"on_update" : ["instrument.instrument.custom_instrument.work_order.work_order.check_stock"],
 	"validate" : ["instrument.instrument.custom_instrument.work_order.work_order.add_bom_level","instrument.instrument.custom_instrument.work_order.work_order.validate"],
@@ -139,7 +140,7 @@ doc_events = {
 	},
 	"Item" : {
 	"validate" :["instrument.instrument.custom_instrument.item.item.validate"],
-	"on_update":"instrument.instrument.custom_instrument.item.item.disable_old_boms",
+	# "on_update":"instrument.instrument.custom_instrument.item.item.disable_old_boms",
 	"after_insert":"instrument.instrument.custom_instrument.item.item.after_insert"
 	},
 	"Production Plan":{
@@ -171,7 +172,7 @@ doc_events = {
  	"on_trash":"instrument.instrument.custom_instrument.material_request.material_request.on_trash"
  	},
  	"Job Card":{
- 	"validate":["instrument.instrument.custom_instrument.job_card.job_card.validate"],
+ 	# "validate":["instrument.instrument.custom_instrument.job_card.job_card.validate"],
  	"after_insert":"instrument.instrument.custom_instrument.job_card.job_card.after_insert"
  	},
  	"Pick List":{
@@ -184,7 +185,7 @@ doc_events = {
  	"Payment Entry":{
  	"validate":"instrument.instrument.custom_instrument.payment_entry.payment_entry.validate",
  	"after_insert":"instrument.instrument.custom_instrument.payment_entry.payment_entry.after_insert",
- 	"on_submit":"instrument.instrument.custom_instrument.payment_entry.payment_entry.create_pdf_for_check_and_attached"
+ 	# "on_submit":"instrument.instrument.custom_instrument.payment_entry.payment_entry.create_pdf_for_check_and_attached"
  	},
  	"BOM Update Log":{
  	"validate":"instrument.instrument.custom_instrument.bom_update_log.bom_update_log.validate"
@@ -235,7 +236,7 @@ doc_events = {
 
 override_doctype_class = {
 	"Purchase Order": "instrument.instrument.custom_instrument.purchase_order.purchase_order.PurchaseOrder",
-	"Sales Invoice": "instrument.instrument.custom_instrument.sales_invoice.sales_invoice.SalesInvoice"
+	# "Sales Invoice": "instrument.instrument.custom_instrument.sales_invoice.sales_invoice.SalesInvoice"
 }
 
 # Document Events

@@ -535,7 +535,7 @@ def override_bom_list(mapped_bom,override_bom_child):
 
 # Get all the boms in order
 def get_all_boms_in_order(bom_childs):
-	if len(bom_childs)>1:
+	if len(bom_childs)>=1:
 		final_list = [row.get('mapped_bom') for row in bom_childs if row.get("mapped_bom")]
 
 		final_list = '(' + ','.join("'{}'".format(i) for i in final_list) + ')'

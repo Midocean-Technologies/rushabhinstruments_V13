@@ -1,24 +1,135 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "SQCT-.####",
  "creation": "2024-08-23 09:05:51.446691",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_break_cgnu"
+  "posting_date",
+  "request_for_quotation",
+  "supplier",
+  "item_code",
+  "get_data",
+  "column_break_nolf",
+  "status",
+  "start_date",
+  "end_date",
+  "material_request",
+  "supplier_quotation",
+  "section_break_wbvz",
+  "sort_by",
+  "column_break_wrrv",
+  "sort_data",
+  "section_break_drhe",
+  "supplier_quotation_comparison_table",
+  "create_purchase_order"
  ],
  "fields": [
   {
-   "fieldname": "section_break_cgnu",
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date"
+  },
+  {
+   "fieldname": "request_for_quotation",
+   "fieldtype": "Link",
+   "label": "Request for Quotation",
+   "options": "Request for Quotation"
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Supplier",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "Item Code",
+   "options": "Item"
+  },
+  {
+   "fieldname": "get_data",
+   "fieldtype": "Button",
+   "label": "Get Data",
+   "options": "get_data"
+  },
+  {
+   "fieldname": "column_break_nolf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nUnder Process\nCompleted"
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Start Date"
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date"
+  },
+  {
+   "fieldname": "material_request",
+   "fieldtype": "Link",
+   "label": "Material Request",
+   "options": "Material Request"
+  },
+  {
+   "fieldname": "supplier_quotation",
+   "fieldtype": "Link",
+   "label": "Supplier Quotation",
+   "options": "Supplier Quotation"
+  },
+  {
+   "fieldname": "section_break_wbvz",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "sort_by",
+   "fieldtype": "Select",
+   "label": "Sort By",
+   "options": "Lead Time Date\nLead Time Days\nLast Purchase Rate\nRate\nSupplier"
+  },
+  {
+   "fieldname": "column_break_wrrv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sort_data",
+   "fieldtype": "Button",
+   "label": "Sort Data"
+  },
+  {
+   "fieldname": "section_break_drhe",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "supplier_quotation_comparison_table",
+   "fieldtype": "Table",
+   "label": "Supplier Quotation Comparison Table",
+   "options": "Supplier Quotation Comparison Table"
+  },
+  {
+   "fieldname": "create_purchase_order",
+   "fieldtype": "Button",
+   "label": "Create Purchase Order"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-23 09:05:51.446691",
+ "modified": "2024-09-18 08:42:14.375387",
  "modified_by": "Administrator",
  "module": "instrument",
  "name": "Supplier Quotation Comparison Tool",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {

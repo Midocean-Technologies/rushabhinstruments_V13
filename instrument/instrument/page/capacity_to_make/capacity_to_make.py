@@ -77,6 +77,7 @@ def get_capacity_data(filters=None):
 	data.update({'date_data':date_data})
 	data.update({'production_item_data':main_item_data})
 	final_data = data
+	print(final_data)
 	path = 'instrument/instrument/page/capacity_to_make/capacity_to_make.html'
 	html=frappe.render_template(path,{'data':data})
 	return {'html':html,'data':final_data}

@@ -47,16 +47,16 @@ def custom_api(doc, event=None):
 	dn_data['addtional_info'] = addtional_info
 	data.update(dn_data)
 	if doc.get('items'):
-	    for item in doc.items:
-	    	additional_data = frappe.db.sql("""SELECT label,value from `tabItem Additional Custom Labels` where parent = '{0}'""".format(item.item_code),as_dict=1)
-	    	label_dict = {item.label:item.value for item in additional_data}
-	    	item_additional_info = []
-	    	item_additional_info.append(label_dict)
-	    	item_data = {'item_code': item.item_code, 'item_name': item.item_name, 'item_group': item.item_group, 'qty': item.qty,'stock_uom': item.stock_uom, 'conversion_factor': 1.0, 'rate': item.rate,'against_sales_order': item.against_sales_order, 'batch_no': item.batch_no, 'serial_no': item.serial_no,'item_expiry_date':str(item.item_expiry_date)}
-	    	# item_data.update(label_dict)
-	    	item_data['item_additional_info'] = item_additional_info
-	    	items.append(item_data)
-	    data.update({'items': items})
+		for item in doc.items:
+			additional_data = frappe.db.sql("""SELECT label,value from `tabItem Additional Custom Labels` where parent = '{0}'""".format(item.item_code),as_dict=1)
+			label_dict = {item.label:item.value for item in additional_data}
+			item_additional_info = []
+			item_additional_info.append(label_dict)
+			item_data = {'item_code': item.item_code, 'item_name': item.item_name, 'item_group': item.item_group, 'qty': item.qty,'stock_uom': item.stock_uom, 'conversion_factor': 1.0, 'rate': item.rate,'against_sales_order': item.against_sales_order, 'batch_no': item.batch_no, 'serial_no': item.serial_no,'item_expiry_date':str(item.item_expiry_date)}
+			# item_data.update(label_dict)
+			item_data['item_additional_info'] = item_additional_info
+			items.append(item_data)
+		data.update({'items': items})
 	path = frappe.db.get_single_value("Rushabh Settings", 'delivery_note_web_hook_url')
 	url = path
 	frappe.msgprint(str(data))

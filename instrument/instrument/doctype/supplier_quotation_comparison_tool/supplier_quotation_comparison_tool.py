@@ -6,7 +6,11 @@ from frappe.model.document import Document
 
 
 class SupplierQuotationComparisonTool(Document):
-	
+
+	@frappe.whitelist()
+	def demo(self, items):
+		print(items)
+
 	@frappe.whitelist()
 	def get_data(self):
 		cond = "1 = 1"
@@ -71,3 +75,51 @@ class SupplierQuotationComparisonTool(Document):
 				"last_purchase_date" : last_purchase_date,
                 "last_purchase_rate" : last_purchase_rate
 			})
+
+	@frappe.whitelist()
+	def make_single_item_purchase_order(self, item_code, item_name, uom, rate, supplier, required_date, qty, material_request=None, min_required_qty=None ):
+		if not required_date:
+			frappe.throw("Please Provide a required date")
+
+		if not qty:
+			frappe.throw("Please Provide a Quantity")
+
+		doc = frappe.new_doc("Purchase Order")
+		doc.supplier = supplier
+		doc.schedule_date = required_date
+		doc.append("items",{
+			"item_code": item_code,
+            "item_name": item_name,
+            "uom": uom,
+            "rate": rate,
+            "qty": qty,
+            "material_request": material_request,
+		})
+		doc.save()
+		return 1, doc.name
+	
+	
+	@frappe.whitelist()
+	def make_bulk_item_purchase_order(self, items):
+		supplier = []
+		for row in items.get('items'):
+			if row.get('supplier') not in supplier:
+				supplier.append(row.get('supplier')) 
+		
+		if len(supplier) > 1:
+			frappe.throw("Please Make a Purchase Order for each Supplier separately")
+
+
+		doc = frappe.new_doc("Purchase Order")
+		doc.supplier = supplier[0]
+		# doc.schedule_date = required_date
+		for row in items.get('items'):
+			doc.append("items",{
+				"item_code": row.get('item_code'),
+				"rate": row.get("rate"),
+				"qty": row.get("purchase_qty"),
+				"material_request": row.get('material_request'),
+				"schedule_date" : row.get('required_by')
+			})
+		doc.save()
+		return 1, doc.name

@@ -70,7 +70,7 @@ def get_data(filters):
 	report_data = []
 	print(filters)
 	batch = filters.get("batch")
-	data = collect_data(batch)
+	data = collect_data(batch, filters)
 	print(data)
 	temp = {
 				"batch": batch,
@@ -148,7 +148,10 @@ def get_data(filters):
 			report_data.append(temp2)
 	return report_data
 
-def collect_data(batch):
+def collect_data(batch, filters=None):
+	cond = ""
+	if filters.get("from_date") and filters.get("to_date"):
+		cond += "AND tsabb.posting_date between {0} and {1}".format(filters.get("from_date") ,filters.get("to_date"))
 	query = """
 		SELECT 
 			tsabb.name as serial_and_batch_bundle,
@@ -163,8 +166,8 @@ def collect_data(batch):
 			tsabb.voucher_no as document_name
 		FROM `tabSerial and Batch Bundle` tsabb 
 		left join `tabSerial and Batch Entry` tsabe on tsabe.parent = tsabb.name
-		where tsabb.type_of_transaction = 'Inward' and tsabb.docstatus = 1 and tsabe.batch_no = '{0}'
-		GROUP BY tsabb.name""".format(batch)
+		where tsabb.type_of_transaction = 'Inward' and tsabb.docstatus = 1 and tsabe.batch_no = '{0}' {1}
+		GROUP BY tsabb.name""".format(batch, cond)
 	print(query)					
 	data = frappe.db.sql(query, as_dict=1)
 	print(data)

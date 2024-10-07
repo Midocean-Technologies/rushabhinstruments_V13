@@ -102,8 +102,8 @@ frappe.ui.form.on("Supplier Quotation Comparison Tool", "create_purchase_order",
                                 if(r.message[0] == 1){
                                   selected.supplier_quotation_comparison_table.forEach(function(item, index, array) {
                                     let row = locals["Supplier Quotation Comparison Table"][item]
-                                    frappe.model.set_value("Supplier Quotation Comparison Table", "item", "purchase_order_created", 1);
-                                    frappe.model.set_value("Supplier Quotation Comparison Table", "item", "purchase_order", r.message[1]);
+                                    frappe.model.set_value("Supplier Quotation Comparison Table", item, "purchase_order_created", 1);
+                                    frappe.model.set_value("Supplier Quotation Comparison Table", item, "purchase_order", r.message[1]);
                                   });
                                   frm.save();
                                   frappe.msgprint("Purchase Order Created Successfully");
@@ -208,7 +208,7 @@ frappe.ui.form.on("Supplier Quotation Comparison Table", "make_purchase_order", 
         if(r.message[0] == 1){
           // row.set_value("purchase_order_created", true);
           frappe.model.set_value(cdt, cdn, "purchase_order_created", 1);
-          frappe.model.set_value("Supplier Quotation Comparison Table", "item", "purchase_order", r.message[1]);
+          frappe.model.set_value(cdt, cdn, "purchase_order", r.message[1]);
           frm.save()
           frappe.msgprint("Purchase Order Created Successfully");
           frm.refresh()

@@ -200,6 +200,13 @@ def get_capacity_data(filters=None):
 def capacity_data(filters=None):
 	filters = json.loads(filters)
 	data = get_capacity_data(filters)
+	doc = frappe.new_doc("API Response Log")
+	doc.response_log = str(data)
+	doc.item = filters.get('production_item')
+	doc.insert(ignore_permissions=True)
+	temp = {}
+	temp["api_response"] = doc.name
+	data.append(temp)
 	path = 'instrument/instrument/page/new_capacity_to_make/new_capacity_to_make.html'
 	html=frappe.render_template(path,{'data':data})
 	return {'html':html,'data':data}
@@ -910,25 +917,25 @@ def download_xlsx():
 
 @frappe.whitelist(allow_guest=True)
 def capacity_to_make_api(production_item=None):
-    filters= {'production_item':production_item}
-    data = get_capacity_data(filters)
-    final_data = []
-    instock = {'in_stock':data[0].get('qty'),'date':data[0].get('date_available')}
-    qty = data[3].get('new_table_data')[0].get(data[0].get('date_available'))-data[0].get('qty')
-    data[3]['new_table_data'][0][data[0].get('date_available')] = qty
-    final_data.append(instock)
-    planned_wo  = frappe.db.sql("""SELECT sum(wo.qty) as qty,date(wo.planned_end_date) as planned_end_date from `tabWork Order` wo where  wo.planned_end_date <= '{0}' and wo.production_item = '{1}' and wo.status not in ('Completed','Stopped') group by wo.planned_end_date""".format(data[2].get('date_available'),production_item),as_dict =1)
-    in_progress = []
-    for row in planned_wo:
-    	in_progress.append({'in_progress_qty':row.get('qty'),'expected_completion_date':row.get('planned_end_date')})
-    final_data.append(in_progress)
-    in_built = []
-    for row in data[3].get('new_table_data')[0]:
-    	for date in data[3].get('date_list'):
-    		if row == date and data[3].get('new_table_data')[0].get(row) > 0:
-    			in_built.append({'qty_can_be_built':data[3].get('new_table_data')[0].get(row),'expected_date':date})
-    final_data.append(in_built)
-    final_data.append({
-    	"lead_time_in_calender_days":data[0].get('calulated_lead_time_in_days')
-    	})
-    return(final_data)
+	filters= {'production_item':production_item}
+	data = get_capacity_data(filters)
+	final_data = []
+	instock = {'in_stock':data[0].get('qty'),'date':data[0].get('date_available')}
+	qty = data[3].get('new_table_data')[0].get(data[0].get('date_available'))-data[0].get('qty')
+	data[3]['new_table_data'][0][data[0].get('date_available')] = qty
+	final_data.append(instock)
+	planned_wo  = frappe.db.sql("""SELECT sum(wo.qty) as qty,date(wo.planned_end_date) as planned_end_date from `tabWork Order` wo where  wo.planned_end_date <= '{0}' and wo.production_item = '{1}' and wo.status not in ('Completed','Stopped') group by wo.planned_end_date""".format(data[2].get('date_available'),production_item),as_dict =1)
+	in_progress = []
+	for row in planned_wo:
+		in_progress.append({'in_progress_qty':row.get('qty'),'expected_completion_date':row.get('planned_end_date')})
+	final_data.append(in_progress)
+	in_built = []
+	for row in data[3].get('new_table_data')[0]:
+		for date in data[3].get('date_list'):
+			if row == date and data[3].get('new_table_data')[0].get(row) > 0:
+				in_built.append({'qty_can_be_built':data[3].get('new_table_data')[0].get(row),'expected_date':date})
+	final_data.append(in_built)
+	final_data.append({
+		"lead_time_in_calender_days":data[0].get('calulated_lead_time_in_days')
+		})
+	return(final_data)

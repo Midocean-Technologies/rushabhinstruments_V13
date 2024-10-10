@@ -140,19 +140,19 @@ def get_data(filters):
 			# 					"indent" : 4
 			# 				}
 			# 				report_data.append(temp2)
-		if i.document_type == "Purchase Receipt":
-			pr_doc = frappe.get_doc("Purchase Receipt", i.document_name)
-			temp2 = {
-				"batch": "",
-				"serial_and_batch_bundle": "",
-				"document_type": "Purchase Receipt",
-				"document_name": pr_doc.name,
-				"item_code": i.item_code,
-				"item_name": i.item_name,
-				"party_name": pr_doc.supplier,
-				"indent" : 3
-			}
-			report_data.append(temp2)
+		# if i.document_type == "Purchase Receipt":
+		# 	pr_doc = frappe.get_doc("Purchase Receipt", i.document_name)
+		# 	temp2 = {
+		# 		"batch": "",
+		# 		"serial_and_batch_bundle": "",
+		# 		"document_type": "Purchase Receipt",
+		# 		"document_name": pr_doc.name,
+		# 		"item_code": i.item_code,
+		# 		"item_name": i.item_name,
+		# 		"party_name": pr_doc.supplier,
+		# 		"indent" : 3
+		# 	}
+		# 	report_data.append(temp2)
 	return report_data
 
 def collect_data(batch, filters=None):
@@ -232,11 +232,11 @@ def get_stock_entry_data(document_name):
 				for xx in mt_sub_list:
 					report_data.append(xx)
 				
-	if sb_list:
-		for rec in sb_list:
-			sub_data = get_sub_entries(rec)
-			for x in sub_data:
-				report_data.append(x)
+	# if sb_list:
+	# 	for rec in sb_list:
+	# 		sub_data = get_sub_entries(rec)
+	# 		for x in sub_data:
+	# 			report_data.append(x)
 	return report_data
 
 def get_sub_entries(sb_rec, filters=None):
@@ -256,26 +256,6 @@ def get_sub_entries(sb_rec, filters=None):
 					for y in data:
 						report_data.append(y)
 
-				# if stock_entry_type == "Material Transfer for Manufacture":
-				# 	work_order = frappe.get_value("Stock Entry", ii.document_name, "work_order")
-				# 	se_list = frappe.get_all("Stock Entry", filters={"stock_entry_type":"Material Transfer for Manufacture", "work_order": work_order})
-				# 	for k in se_list:
-				# 		se_doc1 = frappe.get_doc("Stock Entry", k.name)
-				# 		for kk in se_doc1.items:
-							# get_sub_entries(kk.serial_and_batch_bundle)
-							# for l in pr_data:
-							# 	pr_doc = frappe.get_doc("Purchase Receipt", l.document_name)
-							# 	temp2 = {
-							# 		"batch": l.batch,
-							# 		"serial_and_batch_bundle": l.serial_and_batch_bundle,
-							# 		"document_type": "Purchase Receipt",
-							# 		"document_name": pr_doc.name,
-							# 		"item_code": l.item_code,
-							# 		"item_name": l.item_name,
-							# 		"party_name": pr_doc.supplier,
-							# 		"indent" : 4
-							# 	}
-							# 	report_data.append(temp2)
 			temp3 = {
 				"batch": bench_rec,
 				"serial_and_batch_bundle": ii.serial_and_batch_bundle,

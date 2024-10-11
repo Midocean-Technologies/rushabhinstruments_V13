@@ -25,7 +25,7 @@ import sys
 from openpyxl import Workbook
 from openpyxl.styles import Alignment
 from openpyxl.utils.cell import get_column_letter
-
+from datetime import datetime
 
 import os
 from frappe.utils import get_files_path
@@ -126,6 +126,26 @@ def on_submit(doc,method):
 					er_rev.end_document_type = "Work Order"
 					er_rev.end_transaction = doc.name
 					er_rev.save(ignore_permissions = True)
+	
+	# wo =  frappe.get_doc("Work Order",doc.name)
+	# wo_dict = wo.as_dict()
+	# path = frappe.db.get_single_value("Rushabh Settings", 'work_order_web_hook_url')
+	# url = path
+	# response = requests.post(url, data= json.dumps(wo_dict))
+	# frappe.throw(str(data))
+	def serialize_dict(obj):
+		if isinstance(obj, datetime):
+			return obj.isoformat()
+		raise TypeError(f"Type not serializable")
+
+	wo = frappe.get_doc("Work Order", doc.name)
+	wo_dict = wo.as_dict()
+	serialized_wo_dict = json.loads(json.dumps(wo_dict, default=serialize_dict))
+	path = frappe.db.get_single_value("Rushabh Settings", 'work_order_web_hook_url')
+	url = path
+	
+	response = requests.post(url, data=json.dumps(serialized_wo_dict))
+	frappe.msgprint(str(wo_dict))
 
 @frappe.whitelist()
 def get_prod_engineering_revision(item_code,bom_no):

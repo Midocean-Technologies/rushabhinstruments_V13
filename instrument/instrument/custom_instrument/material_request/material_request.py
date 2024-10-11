@@ -14,6 +14,10 @@ from frappe.utils import (
 	now_datetime,
 	nowdate,
 )
+
+
+
+
 def after_insert(doc,method):
 	pdf_data=frappe.attach_print('Material Request',doc.name, print_format='Material Request Print')
 		
@@ -214,6 +218,19 @@ def update_status_on_production_planning_with_lead_time(doc, method=None):
 			frappe.db.set_value("Raw Materials Table", {'item':row.item_code, 'parent':doc.production_planning_with_lead_time}, "mr_status", doc.status)
 			frappe.db.commit()
 
+	def serialize_dict(obj):
+		if isinstance(obj, datetime):
+			return obj.isoformat()
+		raise TypeError(f"Type not serializable")
+
+		mreq = frappe.get_doc("Material Request",self.name)
+		mreq_dic = mreq.as_dict()
+		serialized_mreq_dic = json.loads(json.dumps(mreq_dic, default=serialize_dict))
+		path = frappe.db.get_single_value("Rushabh Settings", 'material_request_web_hook_url')
+		url = path
+		response = requests.post(url, data=json.dumps(serialized_prod_dic))
+		frappe.throw(str(mreq_dic))
+
 
 def on_trash(doc, method=None):
 	if doc.production_planning_with_lead_time:
@@ -330,3 +347,5 @@ def create_purchase_order(item_lists,supplier,doc,item_list):
 				po_doc.save()
 				print("============== po_doc.name====", po_doc.name)
 				return po_doc.name
+
+ 

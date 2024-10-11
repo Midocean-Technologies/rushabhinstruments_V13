@@ -9,8 +9,11 @@
   "url_data",
   "section_break_2",
   "delivery_note_web_hook_url",
+  "work_order_web_hook_url",
+  "production_plan_web_hook_url",
   "column_break_3",
   "rm_readiness_days",
+  "material_request_web_hook_url",
   "section_break_5",
   "warehouse_table",
   "table_for_item_group",
@@ -68,12 +71,27 @@
    "fieldname": "expiry_days",
    "fieldtype": "Int",
    "label": "Expiry Days"
+  },
+  {
+   "fieldname": "work_order_web_hook_url",
+   "fieldtype": "Data",
+   "label": "Work Order Web Hook URL"
+  },
+  {
+   "fieldname": "production_plan_web_hook_url",
+   "fieldtype": "Data",
+   "label": "Production Plan Web Hook URL"
+  },
+  {
+   "fieldname": "material_request_web_hook_url",
+   "fieldtype": "Data",
+   "label": "Material Request Web Hook URL"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-01-06 00:26:38.869807",
+ "modified": "2024-10-11 02:22:48.562095",
  "modified_by": "Administrator",
  "module": "instrument",
  "name": "Rushabh Settings",
@@ -91,5 +109,6 @@
   }
  ],
  "sort_field": "modified",
- "sort_order": "DESC"
+ "sort_order": "DESC",
+ "states": []
 }

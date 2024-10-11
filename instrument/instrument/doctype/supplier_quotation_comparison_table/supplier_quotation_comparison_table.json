@@ -24,6 +24,7 @@
   "voucher_type",
   "material_request",
   "purchase_order_created",
+  "purchase_order",
   "column_break_ilor",
   "voucher_name",
   "min_required_qty",
@@ -146,12 +147,18 @@
    "fieldname": "make_purchase_order",
    "fieldtype": "Button",
    "label": "Make Purchase Order"
+  },
+  {
+   "fieldname": "purchase_order",
+   "fieldtype": "Link",
+   "label": "Purchase Order",
+   "options": "Purchase Order"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-09-13 08:39:41.953202",
+ "modified": "2024-09-30 08:50:11.774120",
  "modified_by": "Administrator",
  "module": "instrument",
  "name": "Supplier Quotation Comparison Table",

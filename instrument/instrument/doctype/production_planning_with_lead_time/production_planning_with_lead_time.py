@@ -41,6 +41,8 @@ from frappe.utils import now
 from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 from copy import deepcopy
+from datetime import datetime
+import requests
 import json
 
 class ProductionPlanningWithLeadTime(Document):
@@ -53,6 +55,26 @@ class ProductionPlanningWithLeadTime(Document):
 		frappe.db.set_value("Production Planning With Lead Time",self.name,"status","Submitted")
 		frappe.db.commit()
 		self.reload()
+
+		def serialize_datetime(obj):
+			if isinstance(obj, date):
+				return obj.isoformat()  
+			raise TypeError("Type not serializable")
+
+		prod = frappe.get_doc("Production Planning With Lead Time", self.name)
+		prod_dic = prod.as_dict()
+
+		 
+		for key, value in prod_dic.items():
+			if isinstance(value, datetime):
+				prod_dic[key] = value.isoformat()
+
+		path = frappe.db.get_single_value("Rushabh Settings", 'production_plan_web_hook_url')
+		url = path
+		response = requests.post(url, data=json.dumps(prod_dic, default=serialize_datetime))
+		frappe.msgprint(str(prod_dic))
+
+ 
 
 	def on_cancel(self):
 		frappe.db.set_value("Production Planning With Lead Time",self.name,"status","Cancelled")

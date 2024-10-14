@@ -152,7 +152,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-10-11 01:22:12.012396",
+ "modified": "2024-10-14 09:21:01.206579",
  "modified_by": "Administrator",
  "module": "instrument",
  "name": "Sales Order Pick List Item",
@@ -160,5 +160,6 @@
  "permissions": [],
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "track_changes": 1
 }

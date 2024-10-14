@@ -604,7 +604,7 @@ class ConsolidatedPickList(Document):
 								transferred_qty = frappe.db.get_value("Work Order Item",{'parent':item.work_order,'item_code':row},'transferred_qty')
 								# i['required_qty'] = (flt(raw_materials.get(row).get("qty"))-flt(transferred_qty)) 
 								i['required_qty'] = flt(raw_materials.get(row).get("qty"))
-								i['picked_qty'] = 0
+								i['picked_qty'] = 1
 								i['stock_uom'] = raw_materials.get(row).get('stock_uom')
 								i['engineering_revision'] = engineering_revision
 								i['wip_stock'] = flt(raw_materials.get(row).get("wip_stock"))
@@ -921,13 +921,14 @@ class ConsolidatedPickList(Document):
 								"required_qty":itm.get("required_qty"),
 								"stock_qty": itm.get("qty"),
 								"sales_order" : itm.get("order"),
-								"picked_qty" : itm.get('picked_qty'),
+								"picked_qty" : itm.get('picked_qty') or 1,
 								"uom" : itm.get('stock_uom'),
 								"stock_uom":itm.get('stock_uom'),
 								"description":item_data.get('description'),
 								"item_group" : item_data.get("item_group"),
 								"sales_order_item":itm.get("sales_order_item")
 							})
+			 
 			return self.so_batch_assignment_fifo()
 
 
@@ -945,7 +946,7 @@ class ConsolidatedPickList(Document):
 
 		so_list = []
 		for row in self.sales_order_pick_list_item:
-			so_list.append({"item_code":row.item_code, "uom":row.uom, "uom_conversion_factor":row.uom_conversion_factor, "stock_uom":row.stock_uom, "serial_nos":row.serial_no, "warehouse":row.warehouse, "required_qty":row.required_qty, "sales_order":row.sales_order, "stock_qty":0, "picked_qty":0,"sales_order_item":row.sales_order_item})
+			so_list.append({"item_code":row.item_code, "uom":row.uom, "uom_conversion_factor":row.uom_conversion_factor, "stock_uom":row.stock_uom, "serial_nos":row.serial_no, "warehouse":row.warehouse, "required_qty":row.required_qty, "sales_order":row.sales_order, "stock_qty":0, "picked_qty":1,"sales_order_item":row.sales_order_item})
 			# print("===============so_list",so_list)
 		
 		new_list=[]
@@ -1204,7 +1205,7 @@ class ConsolidatedPickList(Document):
 		
 		po_list = []
 		for row in self.purchase_order_pick_list_item:
-			po_list.append({"main_item":row.main_item, "item_code":row.item_code, "uom":row.uom, "uom_conversion_factor":row.uom_conversion_factor, "stock_uom":row.stock_uom, "serial_nos":row.serial_no, "warehouse":row.warehouse, "required_qty":row.required_qty, "purchase_order":row.purchase_order, "stock_qty":0, "picked_qty":0})
+			po_list.append({"main_item":row.main_item, "item_code":row.item_code, "uom":row.uom, "uom_conversion_factor":row.uom_conversion_factor, "stock_uom":row.stock_uom, "serial_nos":row.serial_no, "warehouse":row.warehouse, "required_qty":row.required_qty, "purchase_order":row.purchase_order, "stock_qty":0, "picked_qty":1})
 		
 		new_list=[]
 		allocated_item_dict = dict()
@@ -1263,55 +1264,156 @@ class ConsolidatedPickList(Document):
 						col.update({"qty":0})
 		
 		return new_list
-	
+# old code
+	# @frappe.whitelist()
+	# def new_create_dn_for_so(self):
+		# item_wise_so_data =frappe.db.sql("""SELECT sales_order,item,qty from `tabPick List Sales Order Table` where parent = '{0}'""".format(self.name),as_dict=1)
+		# print("============ite",item_wise_so_data)
+	# 	item_code_list = [i.item for i in item_wise_so_data]
+	# 	if item_wise_so_data:
+	# 		final_so_dict = dict()
+	# 		for row in item_wise_so_data:
+	# 			if row.get("sales_order") in final_so_dict:
+	# 				updated_data = final_so_dict.get(row.get("sales_order"))
+	# 				updated_data.append({'sales_order':row.get('sales_order'),'item':row.get('item')})
+	# 			else:
+	# 				final_so_dict[row.get("sales_order")] = [{'sales_order':row.get('sales_order'),'item':row.get('item')}]
+	# 	print("---------------",final_so_dict)
+	# 	if final_so_dict:
+	# 		for so in final_so_dict:
+	# 			doc = frappe.new_doc("Delivery Note")
+	# 			so_doc = frappe.get_doc("Sales Order", so)
+	# 			print("============so_doc",so_doc)
+	# 			doc.naming_series = "MAT-DN-.YYYY.-"
+	# 			doc.customer = so_doc.customer
+	# 			doc.woocommerce_order_id = so_doc.woocommerce_order_id
+	# 			doc.woocommerce_order_id = so_doc.woocommerce_order_id
+	# 			doc.currency = so_doc.currency
+	# 			doc.selling_price_list = so_doc.selling_price_list
+	# 			doc.selling_price_list = so_doc.selling_price_list
+	# 			doc.taxes_and_charges = "US ST 6% - RI"
+	# 			doc.tc_name = so_doc.tc_name
+	# 			doc.terms = so_doc.terms
+	# 			if so_doc.taxes:
+	# 				for row in so_doc.taxes:
+	# 					doc.append("taxes", {
+	# 						"charge_type": row.charge_type,
+	# 						"account_head": row.account_head,	
+	# 						"description": row.account_head,
+	# 						"rate": row.rate
+	# 					})
+	# 			for item in final_so_dict.get(so):
+	# 				dn_entry = frappe.db.sql("""SELECT name From `tabDelivery Note Item` where against_sales_order='{0}' and item_code='{1}'""".format(so, item.get('item')), as_dict=1)
+	# 				print("=============dn_entry",dn_entry)
+	# 				if len(dn_entry) == 0:
+	# 					so_data = frappe.db.sql("""SELECT item_code, warehouse, sales_order, picked_qty, batch_no, serial_no,sales_order_item from `tabSales Order Pick List Item` where sales_order='{0}' and item_code='{1}' and parent='{2}' """.format(so, item.get('item'), self.name), as_dict=1)
+						
+	# 					# item_code_list = "', '".join(item_code_list)
+	# 					if so_data:
+	# 						for row in so_doc.items:
+	# 							if row.item_code == item.get('item'):
+	# 								for itm in so_data:
+	# 									doc.append("items", {
+	# 										"item_code": row.item_code,
+	# 										"item_name": row.item_name,
+	# 										"description": row.description,
+	# 										"uom": row.uom,
+	# 										"stock_uom": row.stock_uom,
+	# 										"conversion_factor": row.conversion_factor,
+	# 										"qty": itm.get("picked_qty"),
+	# 										"rate": row.rate,
+	# 										"warehouse": itm.get("warehouse"),
+	# 										"batch_no": itm.get("batch_no"),
+	# 										"against_sales_order": so,
+	# 										"serial_no": itm.get("serial_no"),
+	# 										"so_detail":itm.get("sales_order_item")
+	# 									})	
+	# 			doc.save()
+	# 			if doc.name:
+	# 				status = "To Bill" if doc.docstatus==1 else "Draft"
+	# 				if item_code_list:
+	# 					print("=============item",item_code_list)
+	# 					for item in item_code_list:
+	# 						frappe.db.set_value("Pick List Sales Order Table",{'parent':self.name,'item':item,'sales_order':so},'delivery_note',doc.name)
+	# 						frappe.db.set_value("Pick List Sales Order Table",{'parent':self.name,'item':item,'sales_order':so},'delivery_note_status',doc.status)
+	# 				frappe.msgprint("Delivery Note created {0}".format(doc.name))
+					
+	# 			else:
+	# 				frappe.msgprint("Delivery Note already created for Sales Order {0}".format(so.sales_order))
+# old code end 
+	 
+
+# new code 
 	@frappe.whitelist()
 	def new_create_dn_for_so(self):
-		item_wise_so_data =frappe.db.sql("""SELECT sales_order,item,qty from `tabPick List Sales Order Table` where parent = '{0}'""".format(self.name),as_dict=1)
-		print("============ite",item_wise_so_data)
+		item_wise_so_data = frappe.db.sql("""
+			SELECT sales_order, item, qty 
+			FROM `tabPick List Sales Order Table` 
+			WHERE parent = '{0}'
+		""".format(self.name), as_dict=1)
+
+		print("============ite", item_wise_so_data)
+
 		item_code_list = [i.item for i in item_wise_so_data]
+
 		if item_wise_so_data:
 			final_so_dict = dict()
+
 			for row in item_wise_so_data:
-				if row.get("sales_order") in final_so_dict:
-					updated_data = final_so_dict.get(row.get("sales_order"))
-					updated_data.append({'sales_order':row.get('sales_order'),'item':row.get('item')})
+				sales_order = row.get("sales_order")
+				if sales_order in final_so_dict:
+					final_so_dict[sales_order].append({'sales_order': sales_order, 'item': row.get('item')})
 				else:
-					final_so_dict[row.get("sales_order")] = [{'sales_order':row.get('sales_order'),'item':row.get('item')}]
-		print("---------------",final_so_dict)
+					final_so_dict[sales_order] = [{'sales_order': sales_order, 'item': row.get('item')}]
+
+			print("---------------", final_so_dict)
+
 		if final_so_dict:
 			for so in final_so_dict:
 				doc = frappe.new_doc("Delivery Note")
 				so_doc = frappe.get_doc("Sales Order", so)
-				print("============so_doc",so_doc)
+				print("============so_doc", so_doc)
+
+				 
 				doc.naming_series = "MAT-DN-.YYYY.-"
 				doc.customer = so_doc.customer
 				doc.woocommerce_order_id = so_doc.woocommerce_order_id
-				doc.woocommerce_order_id = so_doc.woocommerce_order_id
 				doc.currency = so_doc.currency
-				doc.selling_price_list = so_doc.selling_price_list
 				doc.selling_price_list = so_doc.selling_price_list
 				doc.taxes_and_charges = "US ST 6% - RI"
 				doc.tc_name = so_doc.tc_name
 				doc.terms = so_doc.terms
+
 				if so_doc.taxes:
 					for row in so_doc.taxes:
 						doc.append("taxes", {
 							"charge_type": row.charge_type,
-							"account_head": row.account_head,	
+							"account_head": row.account_head,
 							"description": row.account_head,
-							"rate": row.rate
+							"rate": row.rate or 0  
 						})
+
 				for item in final_so_dict.get(so):
-					dn_entry = frappe.db.sql("""SELECT name From `tabDelivery Note Item` where against_sales_order='{0}' and item_code='{1}'""".format(so, item.get('item')), as_dict=1)
-					print("=============dn_entry",dn_entry)
-					if len(dn_entry) == 0:
-						so_data = frappe.db.sql("""SELECT item_code, warehouse, sales_order, picked_qty, batch_no, serial_no,sales_order_item from `tabSales Order Pick List Item` where sales_order='{0}' and item_code='{1}' and parent='{2}' """.format(so, item.get('item'), self.name), as_dict=1)
-						
-						# item_code_list = "', '".join(item_code_list)
+					dn_entry = frappe.db.sql("""
+						SELECT name 
+						FROM `tabDelivery Note Item` 
+						WHERE against_sales_order='{0}' AND item_code='{1}'
+					""".format(so, item.get('item')), as_dict=1)
+
+					print("=============dn_entry", dn_entry)
+
+					if not dn_entry: 
+						so_data = frappe.db.sql("""
+							SELECT item_code, warehouse, sales_order, picked_qty, batch_no, serial_no, sales_order_item 
+							FROM `tabSales Order Pick List Item` 
+							WHERE sales_order='{0}' AND item_code='{1}' AND parent='{2}'
+						""".format(so, item.get('item'), self.name), as_dict=1)
+
 						if so_data:
 							for row in so_doc.items:
 								if row.item_code == item.get('item'):
 									for itm in so_data:
+										picked_qty = itm.get("picked_qty") or 1
 										doc.append("items", {
 											"item_code": row.item_code,
 											"item_name": row.item_name,
@@ -1319,26 +1421,35 @@ class ConsolidatedPickList(Document):
 											"uom": row.uom,
 											"stock_uom": row.stock_uom,
 											"conversion_factor": row.conversion_factor,
-											"qty": itm.get("picked_qty"),
-											"rate": row.rate,
+											"qty": picked_qty,
+											# "rate": row.rate or 0, 
+											# "base_rate" : row.rate or 0,
+											# "base_amount":picked_qty * (row.rate if row.rate is not None else 0),
 											"warehouse": itm.get("warehouse"),
 											"batch_no": itm.get("batch_no"),
 											"against_sales_order": so,
 											"serial_no": itm.get("serial_no"),
-											"so_detail":itm.get("sales_order_item")
-										})	
+											"so_detail": itm.get("sales_order_item")
+										})
+
+				# Save the document
 				doc.save()
 				if doc.name:
-					status = "To Bill" if doc.docstatus==1 else "Draft"
-					if item_code_list:
-						print("=============item",item_code_list)
-						for item in item_code_list:
-							frappe.db.set_value("Pick List Sales Order Table",{'parent':self.name,'item':item,'sales_order':so},'delivery_note',doc.name)
-							frappe.db.set_value("Pick List Sales Order Table",{'parent':self.name,'item':item,'sales_order':so},'delivery_note_status',doc.status)
-					frappe.msgprint("Delivery Note created {0}".format(doc.name))
+					# frappe.throw(str(doc.name))
+					frappe.msgprint("Delivery Note created: {0}".format(doc.name))
 					
+					if item_code_list:
+						print("=============item", item_code_list)
+						for item in item_code_list:
+							frappe.db.set_value("Pick List Sales Order Table", {'parent': self.name, 'item': item, 'sales_order': so}, 'delivery_note', doc.name)
+							frappe.db.set_value("Pick List Sales Order Table", {'parent': self.name, 'item': item, 'sales_order': so}, 'delivery_note_status', doc.status)
 				else:
-					frappe.msgprint("Delivery Note already created for Sales Order {0}".format(so.sales_order))
+					frappe.msgprint("Delivery Note already created for Sales Order {0}".format(so))
+
+
+# new code end
+
+
 
 		# for so in self.pick_list_sales_order_table:
 		# 	dn_entry = frappe.db.sql("""SELECT name From `tabDelivery Note Item` where against_sales_order='{0}' and item_code='{1}'""".format(so.sales_order, so.item), as_dict=1)

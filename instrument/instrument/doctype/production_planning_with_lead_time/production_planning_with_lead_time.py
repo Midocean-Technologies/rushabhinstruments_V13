@@ -29,9 +29,9 @@ from frappe.utils import (
 from erpnext.manufacturing.doctype.manufacturing_settings.manufacturing_settings import (
 	get_mins_between_operations,
 )
-from datetime import date,timedelta
+from datetime import date,timedelta,datetime
 from erpnext.manufacturing.doctype.bom.bom import get_children, validate_bom_no
-import datetime
+# import datetime
 from erpnext.stock.doctype.item.item import get_item_defaults, get_last_purchase_details
 import openpyxl
 from io import BytesIO
@@ -40,7 +40,7 @@ from frappe.utils import now
 from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 from copy import deepcopy
-from datetime import datetime
+ 
 import requests
 import json
 
@@ -213,7 +213,7 @@ class ProductionPlanningWithLeadTime(Document):
 				total_operation_time_in_mins = flt(operation_time[0].get('operation_time'))*row.get('planned_qty')
 				total_operation_time_in_days = ceil(total_operation_time_in_mins/480)
 				# Calculate date_to_be_ready
-				delivery_date = datetime.datetime.strptime(row.get('delivery_date'), '%Y-%m-%d')
+				delivery_date = datetime.strptime(row.get('delivery_date'), '%Y-%m-%d')
 				delivery_date = delivery_date.date() 
 				date_to_be_ready = (delivery_date-timedelta(total_operation_time_in_days)-timedelta(row.get('makeup_days')))
 
@@ -249,7 +249,7 @@ class ProductionPlanningWithLeadTime(Document):
 			for row in self.fg_items_table:
 				bom_data = []
 				if row.get('planned_qty') > 0:
-					date_to_be_ready = datetime.datetime.strptime(row.get('planned_start_date'), '%Y-%m-%d')
+					date_to_be_ready = datetime.strptime(row.get('planned_start_date'), '%Y-%m-%d')
 					planned_start_date = date_to_be_ready.date()
 					get_sub_assembly_item(row.get("bom"), bom_data, row.get("planned_qty"),planned_start_date,row.name, warehouse_list)
 					bom_data = sorted(bom_data, key = lambda x: x["bom_level"],reverse=1)
@@ -297,7 +297,7 @@ class ProductionPlanningWithLeadTime(Document):
 					item_name = frappe.db.get_value("Item",{'name':item.get('item')},'item_name')
 					item.update({'available_stock':ohs.get(item.get('item')),'lead_time':lead_time,'original_qty':item.get('qty'),'item_name':item_name})
 					rm_readiness_days = frappe.db.get_single_value("Rushabh Settings",'rm_readiness_days')
-					date_to_be_ready = datetime.datetime.strptime(row.get('planned_start_date'), '%Y-%m-%d')
+					date_to_be_ready = datetime.strptime(row.get('planned_start_date'), '%Y-%m-%d')
 					date_to_be_ready = date_to_be_ready.date()
 					required_date = (date_to_be_ready-timedelta(rm_readiness_days))
 					item.update({'date_to_be_ready':required_date})
@@ -359,7 +359,7 @@ class ProductionPlanningWithLeadTime(Document):
 					lead_time = frappe.db.get_value("Item",{'name':item.get('item')},'lead_time_days')
 					item.update({'available_stock':ohs.get(item.get('item')),'lead_time':lead_time,'original_qty':item.get('qty')})
 					rm_readiness_days = frappe.db.get_single_value("Rushabh Settings",'rm_readiness_days')
-					date_to_be_ready = datetime.datetime.strptime(row.get('planned_start_date'), '%Y-%m-%d')
+					date_to_be_ready = datetime.strptime(row.get('planned_start_date'), '%Y-%m-%d')
 					date_to_be_ready = date_to_be_ready.date()
 					required_date = (date_to_be_ready-timedelta(rm_readiness_days))
 					item.update({'date_to_be_ready':required_date})

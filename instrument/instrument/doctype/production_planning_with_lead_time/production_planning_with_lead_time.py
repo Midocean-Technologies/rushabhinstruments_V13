@@ -1,6 +1,7 @@
 # Copyright (c) 2022, instrument and contributors
 # For license information, please see license.txt
 
+from http import server
 import frappe
 from frappe.model.document import Document
 from frappe import _, msgprint
@@ -1065,6 +1066,11 @@ def get_sales_orders(self):
 		item_code = self.item
 		item_filter += " and so_item.item_code = '%s'" % self.item
 
+	if self.sales_order:
+		so_filter += f" and so.name = '%s'"%self.sales_order
+
+	print(so_filter)
+
 	open_so = frappe.db.sql(f"""
 		select distinct so.name, so.transaction_date, so.customer, date(so_item.delivery_date) as delivery_date,so_item.item_code,(so_item.qty-so_item.delivered_qty) as qty,so_item.name as sales_order_item
 		from `tabSales Order` so, `tabSales Order Item` so_item
@@ -1314,3 +1320,7 @@ def update_mr_status_in_raw_materials_table(self, mr_doc):
 	for row in doc.items:
 		frappe.db.set_value("Raw Materials Table", {'item':row.item_code}, "mr_status", doc.status)
 		frappe.db.commit()
+
+
+
+

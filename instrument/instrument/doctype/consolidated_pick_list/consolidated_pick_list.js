@@ -68,7 +68,8 @@ frappe.ui.form.on('Consolidated Pick List', {
 			
 		}
 		//Hide Button
-		if(frm.doc.docstatus == 0 && frm.doc.work_orders != []){
+		// if(frm.doc.docstatus == 0 && frm.doc.work_orders != []){
+		if(frm.doc.work_orders != []){
 			frm.add_custom_button(__('Create Stock Entries In Bulk'), function() {
 				frappe.call({
 					method : "instrument.instrument.doctype.consolidated_pick_list.consolidated_pick_list.create_stock_entries_in_bulk",

@@ -304,9 +304,10 @@ class ConsolidatedPickList(Document):
 							final_subassembly_items.append(col)
 						elif (ohs_dict.get(col) < bom_qty_dict.get(col)):
 							final_subassembly_items.append(col)
-					self.get_work_orders_for_subassembly(final_subassembly_items,planned_start_date,row.work_order,bom_qty_dict)
+					# self.get_work_orders_for_subassembly(final_subassembly_items,planned_start_date,row.work_order,bom_qty_dict)
 				else:
-					self.get_work_orders_for_subassembly(sub_assembly_items,planned_start_date,row.work_order,bom_qty_dict)
+					print("--------------111")
+					# self.get_work_orders_for_subassembly(sub_assembly_items,planned_start_date,row.work_order,bom_qty_dict)
 				
 				job_cards = frappe.db.sql("""SELECT jb.name,jb.status from `tabJob Card` jb where jb.work_order = '{0}'""".format(row.work_order),as_dict=1)
 				if job_cards:
@@ -376,6 +377,7 @@ class ConsolidatedPickList(Document):
 							final_subassembly_items.append(col)
 					self.get_work_orders_for_subassembly(final_subassembly_items,planned_start_date,row.work_order,bom_qty_dict)
 				else:
+					
 					self.get_work_orders_for_subassembly(sub_assembly_items,planned_start_date,row.work_order,bom_qty_dict)
 				
 				job_cards = frappe.db.sql("""SELECT jb.name,jb.status from `tabJob Card` jb where jb.work_order = '{0}'""".format(row.work_order),as_dict=1)
@@ -828,19 +830,19 @@ class ConsolidatedPickList(Document):
 			allocated_war_item_dict = dict()
 		
 			for row in work_list:
-			    wo_item = row.get("item_code")+row.get("work_order")
-			    war_item = row.get("work_order")+row.get("item_code")+row.get("warehouse")
-			    row.update({'actual_required_qty':row.get('required_qty')})
+				wo_item = row.get("item_code")+row.get("work_order")
+				war_item = row.get("work_order")+row.get("item_code")+row.get("warehouse")
+				row.update({'actual_required_qty':row.get('required_qty')})
 
-			    for col in batch_data:
-			        if row.get("item_code")==col.get("item") and row.get("warehouse")==col.get("warehouse") and wo_item not in allocated_item_dict:
-			            item_qty=sum([r.get("picked_qty") for r in new_list if new_list and row.get("item_code")==r.get("item_code") and r.get("item_code")+r.get("work_order")==wo_item])           
-			            rem_reqd_qty = abs(item_qty-row.get("actual_required_qty"))
-			            row.update({"required_qty":rem_reqd_qty})
-			            if col.get("qty")>= row.get("required_qty"):
-			                batch_qty = col.get("qty") - row.get("required_qty") 
-			                new_list.append({
-			                    "item_code":row.get("item_code"), 
+				for col in batch_data:
+					if row.get("item_code")==col.get("item") and row.get("warehouse")==col.get("warehouse") and wo_item not in allocated_item_dict:
+						item_qty=sum([r.get("picked_qty") for r in new_list if new_list and row.get("item_code")==r.get("item_code") and r.get("item_code")+r.get("work_order")==wo_item])           
+						rem_reqd_qty = abs(item_qty-row.get("actual_required_qty"))
+						row.update({"required_qty":rem_reqd_qty})
+						if col.get("qty")>= row.get("required_qty"):
+							batch_qty = col.get("qty") - row.get("required_qty") 
+							new_list.append({
+								"item_code":row.get("item_code"), 
 			                    "warehouse":row.get("warehouse"), 
 			                    "required_qty":row.get("required_qty"),
 			                    "work_order":row.get("work_order"),
@@ -853,16 +855,16 @@ class ConsolidatedPickList(Document):
 								"wip_stock" : row.get('wip_stock'),
 								"actual_required_qty":row.get('actual_required_qty')
 			                })
-			                col.update({"qty":batch_qty})
-			                allocated_item_dict.update({wo_item:wo_item})
-			            else:
-			                reqd_qty = row.get("required_qty")-col.get("qty")
-			                if col.get("qty") > 0:
-			                    new_list.append({
-			                        "item_code":row.get("item_code"), 
-			                        "warehouse":row.get("warehouse"), 
-			                        "required_qty":row.get("required_qty"),
-			                        "work_order":row.get("work_order"),
+							col.update({"qty":batch_qty})
+							allocated_item_dict.update({wo_item:wo_item})
+						else:
+							reqd_qty = row.get("required_qty")-col.get("qty")
+							if col.get("qty") > 0:
+								new_list.append({
+									"item_code":row.get("item_code"), 
+									"warehouse":row.get("warehouse"), 
+									"required_qty":row.get("required_qty"),
+									"work_order":row.get("work_order"),
 			                        "stock_qty":col.get("qty"),
 			                        "picked_qty":col.get("qty"),
 			                        "batch_no": col.get("name"),
@@ -886,7 +888,7 @@ class ConsolidatedPickList(Document):
 									# "stock_uom":row.get("stock_uom")
 			      #               })
 			      #               allocated_war_item_dict.update({war_item:war_item})
-			                col.update({"qty":0})		
+							col.update({"qty":0})		
 			return new_list
 		else:
 			frappe.msgprint("No Items Found For Pick")
@@ -952,55 +954,55 @@ class ConsolidatedPickList(Document):
 		allocated_item_dict = dict()
 		allocated_war_item_dict = dict()
 		for row in so_list:
-		    so_item = row.get("item_code")+row.get("sales_order")
-		    # war_item = row.get("sales_order")+row.get("item_code")+row.get("warehouse")
-		    for col in batch_data:
-		        if row.get("item_code")==col.get("item") and row.get("warehouse")==col.get("warehouse") and so_item not in allocated_item_dict:
-		            item_qty=sum([r.get("picked_qty") for r in new_list if new_list and row.get("item_code")==r.get("item_code") and r.get("item_code")+r.get("sales_order")==so_item])            
-		            rem_reqd_qty = abs(item_qty-row.get("required_qty"))
-		            row.update({"required_qty":rem_reqd_qty})
+			so_item = row.get("item_code")+row.get("sales_order")
+			# war_item = row.get("sales_order")+row.get("item_code")+row.get("warehouse")
+			for col in batch_data:
+				if row.get("item_code")==col.get("item") and row.get("warehouse")==col.get("warehouse") and so_item not in allocated_item_dict:
+					item_qty=sum([r.get("picked_qty") for r in new_list if new_list and row.get("item_code")==r.get("item_code") and r.get("item_code")+r.get("sales_order")==so_item])            
+					rem_reqd_qty = abs(item_qty-row.get("required_qty"))
+					row.update({"required_qty":rem_reqd_qty})
 
-		            serial_no = ""
-		            if frappe.get_cached_value("Item", row.get("item_code"), 'has_serial_no') == 1:
-		            	serial_nos = get_serial_no_batchwise(row.get("item_code"),col.get("name"), row.get("warehouse"), row.get("required_qty"))
-		            	serial_no = serial_nos
+					serial_no = ""
+					if frappe.get_cached_value("Item", row.get("item_code"), 'has_serial_no') == 1:
+						serial_nos = get_serial_no_batchwise(row.get("item_code"),col.get("name"), row.get("warehouse"), row.get("required_qty"))
+						serial_no = serial_nos
 
-		            if col.get("qty")>= row.get("required_qty"):
-		                batch_qty = col.get("qty") - row.get("required_qty") 
-		                new_list.append({
-		                    "item_code":row.get("item_code"), 
-		                    "warehouse":row.get("warehouse"), 
-		                    "required_qty":row.get("required_qty"),
-		                    "sales_order":row.get("sales_order"),
-		                    "stock_qty":col.get("qty"),
-		                    "picked_qty":row.get("required_qty"),
-		                    "batch_no": col.get("name"),
+					if col.get("qty")>= row.get("required_qty"):
+						batch_qty = col.get("qty") - row.get("required_qty") 
+						new_list.append({
+							"item_code":row.get("item_code"), 
+							"warehouse":row.get("warehouse"), 
+							"required_qty":row.get("required_qty"),
+							"sales_order":row.get("sales_order"),
+							"stock_qty":col.get("qty"),
+							"picked_qty":row.get("required_qty"),
+							"batch_no": col.get("name"),
 							"uom":row.get("uom"), 
 							"uom_conversion_factor":row.get("uom_conversion_factor"), 
 							"stock_uom":row.get("stock_uom"),
 							"serial_no": serial_no,
 							"sales_order_item":row.get("sales_order_item")
 		                })
-		                col.update({"qty":batch_qty})
-		                allocated_item_dict.update({so_item:so_item})
-		            else:
-		                reqd_qty = row.get("required_qty")-col.get("qty")
-		                if col.get("qty") > 0:
-		                    new_list.append({
-		                        "item_code":row.get("item_code"), 
-		                        "warehouse":row.get("warehouse"), 
-		                        "required_qty":row.get("required_qty"),
-		                        "sales_order":row.get("sales_order"),
-		                        "stock_qty":col.get("qty"),
-		                        "picked_qty":col.get("qty"),
-		                        "batch_no": col.get("name"),
-		                        "uom":row.get("uom"), 
+						col.update({"qty":batch_qty})
+						allocated_item_dict.update({so_item:so_item})
+					else:
+						reqd_qty = row.get("required_qty")-col.get("qty")
+						if col.get("qty") > 0:
+							new_list.append({
+								"item_code":row.get("item_code"), 
+								"warehouse":row.get("warehouse"), 
+								"required_qty":row.get("required_qty"),
+								"sales_order":row.get("sales_order"),
+								"stock_qty":col.get("qty"),
+								"picked_qty":col.get("qty"),
+								"batch_no": col.get("name"),
+								"uom":row.get("uom"), 
 								"uom_conversion_factor":row.get("uom_conversion_factor"), 
 								"stock_uom":row.get("stock_uom"),
 								"serial_no": serial_no,
 								"sales_order_item":row.get("sales_order_item")
-		                    })
-		                col.update({"qty":0})		
+							})
+						col.update({"qty":0})		
 		return new_list
 
 	def on_submit(self):

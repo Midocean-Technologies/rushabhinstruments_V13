@@ -79,7 +79,7 @@ class ConsolidatedPickList(Document):
 							if bom_items:
 								for item in bom_items:
 									if item.item_code in ohs:
-										qty_will_be_produced = qty_will_be_produced + (ohs.get(item.item_code)*item.qty)
+										qty_will_be_produced = qty_will_be_produced + (ohs.get(item.item_code)/item.qty)
 									if item.item_code in final_qty_dict:
 										qty_will_be_produced = qty_will_be_produced + final_qty_dict.get(item.item_code)
 									qty_will_be_produced_list.append(qty_will_be_produced)
@@ -115,6 +115,7 @@ class ConsolidatedPickList(Document):
 					for row in fg_work_orders:
 						doc = frappe.get_doc("Work Order",row.get("name"))
 						ohs = get_current_stock()
+	
 						bom_childs = []
 						bom_child_list = get_child_boms(doc.bom_no,bom_childs)
 						bom_child_list.append({'bom' : doc.bom_no})
@@ -135,7 +136,9 @@ class ConsolidatedPickList(Document):
 							if bom_items:
 								for item in bom_items:
 									if item.item_code in ohs:
-										qty_will_be_produced = qty_will_be_produced + (ohs.get(item.item_code)*item.qty)
+										# print("--------------------------------------------777----------", ohs.get(item.item_code))
+										# print("--------------------------------------------777----------", item.item_code)
+										qty_will_be_produced = qty_will_be_produced + (ohs.get(item.item_code)/item.qty)
 									if item.item_code in final_qty_dict:
 										qty_will_be_produced = qty_will_be_produced + final_qty_dict.get(item.item_code)
 									qty_will_be_produced_list.append(qty_will_be_produced)
@@ -194,7 +197,7 @@ class ConsolidatedPickList(Document):
 							if bom_items:
 								for item in bom_items:
 									if item.item_code in ohs:
-										qty_will_be_produced = qty_will_be_produced + (ohs.get(item.item_code)*item.qty)
+										qty_will_be_produced = qty_will_be_produced + (ohs.get(item.item_code)/item.qty)
 									if item.item_code in final_qty_dict:
 										qty_will_be_produced = qty_will_be_produced + final_qty_dict.get(item.item_code)
 									qty_will_be_produced_list.append(qty_will_be_produced)
@@ -252,7 +255,7 @@ class ConsolidatedPickList(Document):
 							if bom_items:
 								for item in bom_items:
 									if item.item_code in ohs:
-										qty_will_be_produced = qty_will_be_produced + (ohs.get(item.item_code)*item.qty)
+										qty_will_be_produced = qty_will_be_produced + (ohs.get(item.item_code)/item.qty)
 									if item.item_code in final_qty_dict:
 										qty_will_be_produced = qty_will_be_produced + final_qty_dict.get(item.item_code)
 									qty_will_be_produced_list.append(qty_will_be_produced)

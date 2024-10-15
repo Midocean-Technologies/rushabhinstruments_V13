@@ -499,10 +499,11 @@ frappe.ui.form.on('Pick Orders', {
 								work_order_list :frm.doc.work_orders
 
 							},
-							callback:function(r){
-								if(r.message){
+							callback:function(response){
+								if(response.message){
+									console.log("--------------", response.message)
 									frappe.model.set_value(row.doctype, row.name, 'stock_entry_status','Draft');
-									frappe.model.set_value(row.doctype, row.name, 'stock_entry',r.message);
+									frappe.model.set_value(row.doctype, row.name, 'stock_entry',response.message);
 									// var old_link = window.location.href
 									// var split_data = old_link.split("/app")
 									// var link =  split_data[0]+"/app/stock-entry/"+r.message

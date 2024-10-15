@@ -127,12 +127,7 @@ def on_submit(doc,method):
 					er_rev.end_transaction = doc.name
 					er_rev.save(ignore_permissions = True)
 	
-	# wo =  frappe.get_doc("Work Order",doc.name)
-	# wo_dict = wo.as_dict()
-	# path = frappe.db.get_single_value("Rushabh Settings", 'work_order_web_hook_url')
-	# url = path
-	# response = requests.post(url, data= json.dumps(wo_dict))
-	# frappe.throw(str(data))
+	
 	def serialize_dict(obj):
 		if isinstance(obj, datetime):
 			return obj.isoformat()
@@ -140,11 +135,12 @@ def on_submit(doc,method):
 
 	wo = frappe.get_doc("Work Order", doc.name)
 	wo_dict = wo.as_dict()
-	serialized_wo_dict = json.loads(json.dumps(wo_dict, default=serialize_dict))
+	for key, value in wo_dict.items():
+			if isinstance(value, datetime):
+				wo_dict[key] = value.isoformat()
 	path = frappe.db.get_single_value("Rushabh Settings", 'work_order_web_hook_url')
 	url = path
-	
-	response = requests.post(url, data=json.dumps(serialized_wo_dict))
+	response = requests.post(url, data=json.dumps(wo_dict,default=serialize_datetime))
 	frappe.msgprint(str(wo_dict))
 
 @frappe.whitelist()

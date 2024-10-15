@@ -128,7 +128,7 @@ def on_submit(doc,method):
 					er_rev.save(ignore_permissions = True)
 	
 	
-	def serialize_dict(obj):
+	def serialize_datetime(obj):
 		if isinstance(obj, datetime):
 			return obj.isoformat()
 		raise TypeError(f"Type not serializable")

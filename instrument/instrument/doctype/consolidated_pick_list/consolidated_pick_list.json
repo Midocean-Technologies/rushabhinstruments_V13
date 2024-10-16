@@ -39,6 +39,7 @@
   "change_batches_as_per_previous_consolidated_pick_list",
   "change_batches",
   "work_order_pick_list_item",
+  "unstock_items_table",
   "consider_current_stock",
   "section_break_29",
   "get_fg_sales_orders",
@@ -396,12 +397,18 @@
    "fieldname": "change_batches_as_per_previous_consolidated_pick_list",
    "fieldtype": "Check",
    "label": "Change Batches As per Previous Consolidated Pick List"
+  },
+  {
+   "fieldname": "unstock_items_table",
+   "fieldtype": "Table",
+   "label": "Unstock Items Table",
+   "options": "Work Order Unstock Items"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-07-31 02:54:09.625430",
+ "modified": "2024-10-16 09:16:24.534737",
  "modified_by": "Administrator",
  "module": "instrument",
  "name": "Consolidated Pick List",

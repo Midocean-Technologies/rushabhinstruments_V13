@@ -70,9 +70,10 @@ class ProductionPlanningWithLeadTime(Document):
 				prod_dic[key] = value.isoformat()
 
 		path = frappe.db.get_single_value("Rushabh Settings", 'production_plan_web_hook_url')
-		url = path
-		response = requests.post(url, data=json.dumps(prod_dic, default=serialize_datetime))
-		frappe.msgprint(str(prod_dic))
+		if path:
+			url = path
+			response = requests.post(url, data=json.dumps(prod_dic, default=serialize_datetime))
+			frappe.msgprint(str(prod_dic))
 
  
 
